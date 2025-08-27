@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -16,12 +17,10 @@ use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\NotificationController;
 
 Route::fallback(function () {
-    if(Auth::user()){
+    if (Auth::user()) {
         return response()->view('errors.404', [], 404);
-        
-    }else{
+    } else {
         return response()->view('errors.404ns', [], 404);
-
     }
 })->name('error.404');
 
@@ -40,13 +39,15 @@ Route::get('/informasi/{id}', [HomeController::class, 'showInformation'])->name(
 
 
 // Authentication Routes
-Route::get('login', [AuthController::class, 'index'])->name('login');
-Route::post('login', [AuthController::class, 'login']);
-Route::get('register', [AuthController::class, 'register'])->name('register');
-Route::post('register', [AuthController::class, 'doregister']);
-Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware(['guest'])->group(function () {
+    Route::get('login', [AuthController::class, 'index'])->name('login');
+    Route::post('login', [AuthController::class, 'login']);
+    Route::get('register', [AuthController::class, 'register'])->name('register');
+    Route::post('register', [AuthController::class, 'doregister']);
+});
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('pengaduan-saya/check', [DashboardController::class, 'checkComplaintStatus'])->name('pengaduan-saya.check');
     Route::prefix('data-masyarakat')->group(function () {
@@ -58,7 +59,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{id}', [ResidentController::class, 'update'])->name('data-masyarakat.update');
         Route::delete('/delete/{id}', [ResidentController::class, 'destroy'])->name('data-masyarakat.destroy');
     });
-    
+
     Route::prefix('manajemen-pengguna')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('manajemen-pengguna.index');
         Route::get('/create', [UserController::class, 'create'])->name('manajemen-pengguna.create');
@@ -139,7 +140,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('notifikasi.index');
         Route::post('{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifikasi.mark-as-read');
         Route::post('mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifikasi.mark-all-read');
-
     });
 
 
@@ -151,15 +151,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('profile', [UserController::class, 'profile'])->name('profile.index');
     Route::put('profile/update', [UserController::class, 'profile'])->name('profile.update');
-    
+
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings/store', [SettingController::class, 'save'])->name('settings.store');
 
     Route::get('profil-kelurahan', [SettingController::class, 'profile'])->name('profil-kelurahan.index');
     Route::post('profil-kelurahan/store', [SettingController::class, 'saveProfile'])->name('profil-kelurahan.store');
-    
-    
 });
 
 // Route::resource('data-masyarakat', ResidentController::class);
-

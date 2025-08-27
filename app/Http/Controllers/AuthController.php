@@ -155,7 +155,7 @@ class AuthController extends Controller
             return redirect('/login')->with('success', 'Pendaftaran berhasil, sedang dalam verifikasi administrator.');
         } catch (\Exception $e) {
             DB::rollBack();
-        dd($e);
+        // dd($e);
 
             return redirect()->back()
                 ->withErrors(['error' => 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.'])
