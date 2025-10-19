@@ -55,7 +55,7 @@ class AuthController extends Controller
         $attempts = Cache::get($key, 0);
         $lockoutTime = Cache::get($lockoutKey);
 
-        // 🧹 STEP 1: reset otomatis kalau sudah lewat masa tunggu
+        // 🧹 STEP 1: Reset jika masa tunggu sudah habis
         if ($lockoutTime && Carbon::now()->greaterThanOrEqualTo($lockoutTime)) {
             Cache::forget($key);
             Cache::forget($lockoutKey);
@@ -63,7 +63,7 @@ class AuthController extends Controller
             $lockoutTime = null;
         }
 
-        // 🚫 STEP 2: Jika masih dalam masa tunggu
+        // 🚫 STEP 2: Jika masih terkunci
         if ($lockoutTime && Carbon::now()->lessThan($lockoutTime)) {
             $remaining = max(0, (int) ceil(Carbon::now()->diffInRealSeconds($lockoutTime, false)));
             return redirect()->back()->with('error', "Terlalu banyak percobaan gagal. Silakan coba lagi dalam {$remaining} detik.");
@@ -87,24 +87,24 @@ class AuthController extends Controller
             }
         }
 
-        // ❌ STEP 4: Tambah percobaan gagal
+        // 🚨 STEP 4: Tambah percobaan gagal terlebih dahulu
         $attempts++;
-        Cache::put($key, $attempts, now()->addSeconds(20)); // Percobaan berlaku 20 detik
 
-        // 🚨 STEP 5: Jika sudah gagal 3x, kunci selama 15 detik
+        // STEP 5: Jika sudah gagal ke-3 kali, langsung kunci
         if ($attempts >= 3) {
             $lockoutTime = Carbon::now()->addSeconds(15);
-            Cache::put($lockoutKey, $lockoutTime, now()->addSeconds(20)); // Kunci 15 detik
+            Cache::put($lockoutKey, $lockoutTime, $lockoutTime);
+            Cache::put($key, $attempts, $lockoutTime);
             $remaining = (int) ceil(Carbon::now()->diffInRealSeconds($lockoutTime, false));
+
             return redirect()->back()->with('error', "Terlalu banyak percobaan gagal. Silakan coba lagi dalam {$remaining} detik.");
         }
 
-        // ⚠️ STEP 6: Kalau belum 3x gagal → tampil pesan biasa
+        // STEP 6: Kalau belum 3x, baru simpan percobaannya dan tampilkan pesan salah
+        Cache::put($key, $attempts, now()->addSeconds(15));
+
         return redirect()->back()->with('error', 'Username atau password salah');
     }
-
-
-
 
     public function register()
     {
