@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Resident;
 use App\Models\Notification;
@@ -9,18 +10,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('auth.login');
-    }
+        $username = $request->old('username', 'guest');
+        $lockoutKey = 'login_attempts_' . $username . '_' . $request->ip() . '_time';
+        $lockoutTime = Cache::get($lockoutKey);
+        $isLocked = false;
+        $remainingSeconds = 0;
 
-    public function register()
-    {
-        return view('auth.register');
+        if ($lockoutTime && Carbon::now()->lessThan($lockoutTime)) {
+            $isLocked = true;
+            // Pastikan angka positif dan bulat (dibulatkan ke bawah)
+            $remainingSeconds = max(0, (int) floor(Carbon::now()->diffInSeconds($lockoutTime, false)));
+        } else {
+            Cache::forget($lockoutKey);
+        }
+
+        return view('auth.login', compact('isLocked', 'remainingSeconds'));
     }
 
     public function login(Request $request)
@@ -31,40 +43,72 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $credentials = $request->only('username', 'password');
-        
-        // Try to authenticate with email
-        if (Auth::attempt(['email' => $credentials['username'], 'password' => $credentials['password']])) {
+        $username = $request->input('username');
+        $password = $request->input('password');
+
+        $key = 'login_attempts_' . $username . '_' . $request->ip();
+        $lockoutKey = $key . '_time';
+
+        $attempts = Cache::get($key, 0);
+        $lockoutTime = Cache::get($lockoutKey);
+
+        // 🧹 STEP 1: reset otomatis kalau sudah lewat masa tunggu
+        if ($lockoutTime && Carbon::now()->greaterThanOrEqualTo($lockoutTime)) {
+            Cache::forget($key);
+            Cache::forget($lockoutKey);
+            $attempts = 0;
+            $lockoutTime = null;
+        }
+
+        // 🚫 STEP 2: Jika masih dalam masa tunggu
+        if ($lockoutTime && Carbon::now()->lessThan($lockoutTime)) {
+            $remaining = max(0, (int) ceil(Carbon::now()->diffInRealSeconds($lockoutTime, false)));
+            return redirect()->back()->with('error', "Terlalu banyak percobaan gagal. Silakan coba lagi dalam {$remaining} detik.");
+        }
+
+        // 🔐 STEP 3: Coba login (email atau username)
+        if (
+            Auth::attempt(['email' => $username, 'password' => $password]) ||
+            Auth::attempt(['username' => $username, 'password' => $password])
+        ) {
             if (Auth::user()->status == 'Aktif') {
+                Cache::forget($key);
+                Cache::forget($lockoutKey);
                 return redirect()->intended('/dashboard')->with('success', 'Berhasil login');
-            }elseif (Auth::user()->status == 'Tidak Aktif') {
+            } elseif (Auth::user()->status == 'Tidak Aktif') {
                 Auth::logout();
                 return redirect()->back()->with('error', 'Akun anda tidak aktif');
-            }else{
+            } else {
                 Auth::logout();
-                return redirect()->back()->with('error', 'Akun anda sedang dalam verifikasi admin'); 
+                return redirect()->back()->with('error', 'Akun anda sedang dalam verifikasi admin');
             }
         }
 
-        // Try to authenticate with username
-        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']])) {
-            if (Auth::user()->status == 'Aktif') {
-                return redirect()->intended('/dashboard')->with('success', 'Berhasil login');
-            }elseif (Auth::user()->status == 'Tidak Aktif') {
-                Auth::logout();
-                return redirect()->back()->with('error', 'Akun anda tidak aktif');
-            }else{
-                Auth::logout();
-                return redirect()->back()->with('error', 'Akun anda sedang dalam verifikasi admin'); 
-            }
+        // ❌ STEP 4: Tambah percobaan gagal
+        $attempts++;
+        Cache::put($key, $attempts, now()->addSeconds(20)); // Percobaan berlaku 20 detik
+
+        // 🚨 STEP 5: Jika sudah gagal 3x, kunci selama 15 detik
+        if ($attempts >= 3) {
+            $lockoutTime = Carbon::now()->addSeconds(15);
+            Cache::put($lockoutKey, $lockoutTime, now()->addSeconds(20)); // Kunci 15 detik
+            $remaining = (int) ceil(Carbon::now()->diffInRealSeconds($lockoutTime, false));
+            return redirect()->back()->with('error', "Terlalu banyak percobaan gagal. Silakan coba lagi dalam {$remaining} detik.");
         }
 
+        // ⚠️ STEP 6: Kalau belum 3x gagal → tampil pesan biasa
         return redirect()->back()->with('error', 'Username atau password salah');
+    }
+
+
+
+
+    public function register()
+    {
+        return view('auth.register');
     }
 
     public function doregister(Request $request)
@@ -155,12 +199,86 @@ class AuthController extends Controller
             return redirect('/login')->with('success', 'Pendaftaran berhasil, sedang dalam verifikasi administrator.');
         } catch (\Exception $e) {
             DB::rollBack();
-        // dd($e);
+            // dd($e);
 
             return redirect()->back()
                 ->withErrors(['error' => 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.'])
                 ->withInput();
         }
+    }
+
+    public function forgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendOtp(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'Email tidak ditemukan dalam sistem.');
+        }
+
+        // Generate 6-digit OTP
+        $otp = rand(100000, 999999);
+        $expiresAt = now()->addMinutes(5);
+
+        // Simpan OTP ke cache (berlaku 5 menit)
+        Cache::put('otp_' . $user->email, [
+            'code' => $otp,
+            'expires_at' => $expiresAt
+        ], $expiresAt);
+
+        // Kirim Email
+        Mail::send('emails.otp', ['otp' => $otp, 'user' => $user], function ($message) use ($user) {
+            $message->to($user->email);
+            $message->subject('Kode OTP Reset Password');
+        });
+
+        return redirect()->route('auth.reset-password')->with([
+            'success' => 'Kode OTP telah dikirim ke email Anda. Silakan periksa kotak masuk.',
+            'email' => $user->email
+        ]);
+    }
+
+    public function resetPasswordForm(Request $request)
+    {
+        $email = session('email');
+        return view('auth.reset-password', compact('email'));
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6',
+            'password' => 'required|min:6|confirmed'
+        ], [
+            'password.confirmed' => 'Konfirmasi password tidak sama dengan password baru.',
+            'password.min' => 'Password minimal 6 karakter.',
+        ]);
+
+        $data = Cache::get('otp_' . $request->email);
+
+        if (!$data || $data['code'] != $request->otp) {
+            return redirect()->back()->withInput()->with('error', 'Kode OTP tidak valid atau sudah kadaluarsa.');
+        }
+
+        // Update password
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return redirect()->back()->withInput()->with('error', 'Email tidak ditemukan.');
+        }
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        // Hapus OTP dari cache
+        Cache::forget('otp_' . $request->email);
+
+        // ✅ Setelah berhasil reset password, tampilkan alert sukses di halaman login
+        return redirect()->route('login')->with('success', 'Password berhasil diperbarui! Silakan login menggunakan password baru Anda.');
     }
 
     public function logout()
@@ -169,5 +287,3 @@ class AuthController extends Controller
         return redirect('/login')->with('success', 'Berhasil logout');
     }
 }
-
-

@@ -44,6 +44,12 @@ Route::middleware(['guest'])->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::get('register', [AuthController::class, 'register'])->name('register');
     Route::post('register', [AuthController::class, 'doregister']);
+
+    // 🔑 Forgot password with OTP
+    Route::get('forgot-password', [AuthController::class, 'forgotPassword'])->name('auth.forgot-password');
+    Route::post('forgot-password', [AuthController::class, 'sendOtp'])->name('auth.send-otp');
+    Route::get('reset-password', [AuthController::class, 'resetPasswordForm'])->name('auth.reset-password');
+    Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset-password.post');
 });
 
 Route::middleware(['auth'])->group(function () {
