@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -50,6 +51,25 @@ Route::middleware(['guest'])->group(function () {
     Route::post('forgot-password', [AuthController::class, 'sendOtp'])->name('auth.send-otp');
     Route::get('reset-password', [AuthController::class, 'resetPasswordForm'])->name('auth.reset-password');
     Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset-password.post');
+
+
+    Route::get('/test-mail', function () {
+        $details = [
+            'title' => 'Test Email dari Laravel',
+            'body' => 'Ini adalah email percobaan menggunakan konfigurasi Mailtrap.'
+        ];
+
+        try {
+            Mail::raw($details['body'], function ($message) use ($details) {
+                $message->to('ndemndem69@gmail.com') // ← ganti dengan email tujuan (bisa dummy di Mailtrap)
+                    ->subject($details['title']);
+            });
+
+            return '✅ Email berhasil dikirim!';
+        } catch (\Exception $e) {
+            return '❌ Gagal mengirim email: ' . $e->getMessage();
+        }
+    });
 });
 
 Route::middleware(['auth'])->group(function () {
