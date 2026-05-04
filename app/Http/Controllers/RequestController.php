@@ -25,7 +25,17 @@ class RequestController extends Controller
         if ($request->ajax()) {
             $query = RequestLetter::with(['user', 'requestType'])
                 ->when($request->status && $request->status != 'semua', function($q) use ($request) {
-                    return $q->where('status', $request->status);
+                    // Capitalize status from JS tab ID to match DB enum (e.g. 'diajukan' -> 'Diajukan')
+                    return $q->where('status', ucfirst($request->status));
+                })
+                ->when($request->date_from, function($q) use ($request) {
+                    return $q->whereDate('created_at', '>=', $request->date_from);
+                })
+                ->when($request->date_to, function($q) use ($request) {
+                    return $q->whereDate('created_at', '<=', $request->date_to);
+                })
+                ->when($request->request_type_id, function($q) use ($request) {
+                    return $q->where('request_type_id', $request->request_type_id);
                 });
             // if (Auth::user()->role == 'admin') {
             //     $query = $query->whereIn('status', ['Diproses', 'Ditolak', 'Selesai']);
@@ -65,7 +75,8 @@ class RequestController extends Controller
         }
 
         $data = [
-            'title' => 'Data Pengajuan'
+            'title'        => 'Data Pengajuan',
+            'requestTypes' => \App\Models\RequestType::where('status', true)->orderBy('name')->get(),
         ];
 
         return view('cms.request.index', $data);
