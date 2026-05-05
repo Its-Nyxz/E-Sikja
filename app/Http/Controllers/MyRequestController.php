@@ -53,7 +53,7 @@ class MyRequestController extends Controller
             if ($request->request_type_id) {
                 $query = $query->where('request_type_id', $request->request_type_id);
             }
-            $query = $query->orderBy('created_at', 'desc');
+            $query = $query->orderBy('created_at', 'asc');
 
             return DataTables::of($query)
                 ->addIndexColumn()
