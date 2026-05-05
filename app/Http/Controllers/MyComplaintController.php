@@ -36,7 +36,7 @@ class MyComplaintController extends Controller
             if ($status != 'semua') {
                 $query = $query->where('status', $status);
             }
-            $query = $query->orderBy('created_at', 'desc');
+            $query = $query->orderBy('created_at', 'asc');
 
             return DataTables::of($query)
                 ->addIndexColumn()
@@ -113,10 +113,10 @@ class MyComplaintController extends Controller
 
         DB::beginTransaction();
         try {
-            $code = "CMP/".date('y')."/".date('m')."/".date('d');
-            $complaintLast = Complaint::where('code', 'like', "$code%")->latest()->first();
-            $lastNumber = $complaintLast ? intval(substr($complaintLast->code, -3)) + 1 : 1;
-            $code .= '/'.str_pad($lastNumber, 3, '0', STR_PAD_LEFT);
+            $baseCode = "CMP";
+            $complaintLast = Complaint::where('code', 'like', "$baseCode-%")->orderBy('id', 'desc')->first();
+            $lastNumber = $complaintLast ? intval(substr($complaintLast->code, -4)) + 1 : 1;
+            $code = $baseCode . '-' . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
 
             $complaint = new Complaint();
             $complaint->code = $code;
