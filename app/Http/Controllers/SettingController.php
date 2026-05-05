@@ -34,6 +34,14 @@ class SettingController extends Controller
     {
         $settings = $this->getSettings();
         
+        // Validate file uploads
+        $request->validate([
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,ico|max:2048',
+            'favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,ico|max:1024',
+            'ttd_lurah' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'cap_lurah' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         // Handle file uploads
         $fileFields = ['logo', 'favicon', 'ttd_lurah', 'cap_lurah'];
         foreach ($fileFields as $field) {
