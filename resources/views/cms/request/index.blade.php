@@ -193,7 +193,7 @@ $(document).ready(function () {
                 },
                 { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
             ],
-            order: [[3, 'desc']],
+            order: [[3, 'asc']],
             language: { url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json" }
         });
 
