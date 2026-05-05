@@ -164,7 +164,8 @@
                 {data: 'title', name: 'title'},
                 {data: 'status', name: 'status'},
                 {data: 'action', name: 'action', orderable: false, searchable: false}
-            ]
+            ],
+            order: [[1, 'asc']]
         });
 
         $('#status-filter').change(function() {
