@@ -164,7 +164,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/informasi-kelurahan/${id}`,
+                        url: `/informasi-kelurahan/delete/${id}`,
                         type: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'
