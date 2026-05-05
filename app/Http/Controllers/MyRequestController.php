@@ -105,6 +105,10 @@ class MyRequestController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'documents.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         DB::beginTransaction();
         try {
             $data = $request->all();
@@ -216,6 +220,10 @@ class MyRequestController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'documents.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         DB::beginTransaction();
         try {
             $data = $request->all();
