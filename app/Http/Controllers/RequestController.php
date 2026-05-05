@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\HistoryRequestLetter;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use App\Exports\RequestExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RequestController extends Controller
 {
@@ -80,6 +82,14 @@ class RequestController extends Controller
         ];
 
         return view('cms.request.index', $data);
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $filters = $request->only(['status', 'date_from', 'date_to', 'request_type_id']);
+        $role = Auth::user()->role;
+        
+        return Excel::download(new RequestExport($filters, $role), 'Data_Pengajuan_' . date('YmdHis') . '.xlsx');
     }
 
     public function show($id){
