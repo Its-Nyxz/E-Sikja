@@ -57,14 +57,14 @@
                             <div class="tab-pane fade" id="logo">
                                 <div class="mb-3">
                                     <label for="logo" class="form-label">Logo Website</label>
-                                    <input type="file" class="form-control" id="logo" name="logo">
+                                    <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
                                     @if(isset($settings['logo']))
                                         <img src="{{ asset('setting/' . $settings['logo']) }}" alt="Logo" class="mt-2" style="max-height: 100px;">
                                     @endif
                                 </div>
                                 <div class="mb-3">
                                     <label for="favicon" class="form-label">Favicon</label>
-                                    <input type="file" class="form-control" id="favicon" name="favicon">
+                                    <input type="file" class="form-control" id="favicon" name="favicon" accept="image/*">
                                     @if(isset($settings['favicon']))
                                         <img src="{{ asset('setting/' . $settings['favicon']) }}" alt="Favicon" class="mt-2" style="max-height: 32px;">
                                     @endif
@@ -75,14 +75,14 @@
                             <div class="tab-pane fade" id="ttd">
                                 <div class="mb-3">
                                     <label for="ttd_lurah" class="form-label">Tanda Tangan Lurah</label>
-                                    <input type="file" class="form-control" id="ttd_lurah" name="ttd_lurah">
+                                    <input type="file" class="form-control" id="ttd_lurah" name="ttd_lurah" accept="image/*">
                                     @if(isset($settings['ttd_lurah']))
                                         <img src="{{ asset('setting/' . $settings['ttd_lurah']) }}" alt="Tanda Tangan Lurah" class="mt-2" style="max-height: 100px;">
                                     @endif
                                 </div>
                                 <div class="mb-3">
                                     <label for="cap_lurah" class="form-label">Cap Lurah</label>
-                                    <input type="file" class="form-control" id="cap_lurah" name="cap_lurah">
+                                    <input type="file" class="form-control" id="cap_lurah" name="cap_lurah" accept="image/*">
                                     @if(isset($settings['cap_lurah']))
                                         <img src="{{ asset('setting/' . $settings['cap_lurah']) }}" alt="Cap Lurah" class="mt-2" style="max-height: 100px;">
                                     @endif
