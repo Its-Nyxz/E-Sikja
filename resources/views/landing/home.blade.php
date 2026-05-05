@@ -11,7 +11,7 @@
             </div>
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80" alt="{{ $profile['nama_instansi'] }}">
+                    <img src="{{ asset('assets/img/1.jpeg') }}" alt="{{ $profile['nama_instansi'] }}">
                     <div class="carousel-caption">
                         <h1>Selamat Datang di {{ $profile['nama_instansi'] }}</h1>
                         <p>{{ $setting['website_description'] }}</p>
@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80" alt="Layanan {{ $profile['nama_instansi'] }}">
+                    <img src="{{ asset('assets/img/2.jpeg') }}" alt="Layanan {{ $profile['nama_instansi'] }}">
                     <div class="carousel-caption">
                         <h1>Layanan Terpadu</h1>
                         <p>Pengajuan surat dan pengaduan dapat dilakukan secara online</p>
@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80" alt="Potensi {{ $profile['nama_instansi'] }}">
+                    <img src="{{ asset('assets/img/3.jpeg') }}" alt="Potensi {{ $profile['nama_instansi'] }}">
                     <div class="carousel-caption">
                         <h1>Kelurahan yang Maju</h1>
                         <p>Mengembangkan potensi Kelurahan untuk kesejahteraan masyarakat</p>
