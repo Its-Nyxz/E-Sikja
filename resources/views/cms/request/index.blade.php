@@ -48,6 +48,9 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Data Pengajuan</h3>
+                    <button id="btn-export" class="btn btn-sm btn-success">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
                 </div>
                 <div class="card-body">
 
@@ -236,6 +239,17 @@ $(document).ready(function () {
         filterDateTo   = '';
         filterTypeId   = '';
         reloadActive();
+    });
+
+    // ---- Export button ----
+    $('#btn-export').on('click', function () {
+        let url = "{{ route('data-pengajuan.export') }}?";
+        url += "status=" + activeStatus;
+        url += "&date_from=" + filterDateFrom;
+        url += "&date_to=" + filterDateTo;
+        url += "&request_type_id=" + filterTypeId;
+        
+        window.location.href = url;
     });
 
     // ---- Allow pressing Enter on date inputs ----
