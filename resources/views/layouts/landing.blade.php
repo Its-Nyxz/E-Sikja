@@ -70,13 +70,13 @@ $profile = $setting['profile']??[];
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-3 mb-md-0">
                     <h5>{{  $setting['website_name']}}</h5>
-                    <p>{{  $setting['website_description']}}</p>
+                    <p>Sistem Pelayanan Masyarakat Kelurahan Jantiharjo yang Modern dan Efisien</p>
                     <p><i class="fas fa-map-marker-alt me-2"></i>{{  $profile['alamat_instansi']}}</p>
-                    <p><i class="fas fa-clock me-2"></i>Senin - Jumat: 08:00 - 16:00 | Sabtu: 08:00 - 12:00</p>
+                    <p><i class="fas fa-clock me-2"></i>Senin - Jumat: 08:00 - 16:00</p>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-3 mb-md-0">
                     <h5>Kontak</h5>
-                    <p><i class="fas fa-phone me-2"></i>{{  $setting['telepon'] ??  '(021)  12345678'}}</p>
+                    <p><i class="fas fa-phone me-2"></i>+62 895-4032-47687</p>
                     <p><i class="fas fa-envelope me-2"></i>{{  $setting['email']}}</p>
                 </div>
                 <div class="col-lg-4 col-md-12">
@@ -87,7 +87,6 @@ $profile = $setting['profile']??[];
                         <a href="{{ $setting['youtube']??'#' }}" class="text-dark"><i class="fab fa-youtube"></i></a>
                         <a href="{{ $setting['twitter']??'#' }}" class="text-dark"><i class="fab fa-twitter"></i></a>
                     </div>
-                    <p class="small">Dapatkan informasi terbaru melalui media sosial kami</p>
                 </div>
             </div>
             <div class="footer-bottom">
