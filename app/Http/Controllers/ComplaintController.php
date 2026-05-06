@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Notification;
 use Yajra\DataTables\Facades\DataTables;
+use App\Exports\ComplaintExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ComplaintController extends Controller
 {
@@ -24,34 +26,23 @@ class ComplaintController extends Controller
         if ($request->ajax()) {
             $query = Complaint::with(['user'])
                 ->when($request->status && $request->status != 'semua', function($q) use ($request) {
-                    return $q->where('status', $request->status);
+                    return $q->where('status', ucfirst($request->status));
+                })
+                ->when($request->date_from, function($q) use ($request) {
+                    return $q->whereDate('created_at', '>=', $request->date_from);
+                })
+                ->when($request->date_to, function($q) use ($request) {
+                    return $q->whereDate('created_at', '<=', $request->date_to);
                 });
 
             if (Auth::user()->role == 'admin') {
                 $query = $query->whereIn('status', ['Diproses', 'Ditolak', 'Selesai']);
             }
 
+            $query = $query->orderBy('created_at', 'asc');
+
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->editColumn('status', function($row) {
-                    $badge = '<span class="badge bg-';
-                    switch ($row->status) {
-                        case 'Diajukan':
-                            $badge .= 'warning';
-                            break;
-                        case 'Diproses':
-                            $badge .= 'primary';
-                            break;
-                        case 'Ditolak':
-                            $badge .= 'danger';
-                            break;
-                        case 'Selesai':
-                            $badge .= 'success';
-                            break;
-                    }
-                    $badge .= '">'.$row->status.'</span>';
-                    return $badge;
-                })
                 ->editColumn('created_at', function($row) {
                     return date('d-m-Y H:i', strtotime($row->created_at));
                 })
@@ -79,6 +70,14 @@ class ComplaintController extends Controller
         ];
 
         return view('cms.complaint.index', $data);
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $filters = $request->only(['status', 'date_from', 'date_to']);
+        $role = Auth::user()->role;
+        
+        return Excel::download(new ComplaintExport($filters, $role), 'Data_Pengaduan_' . date('YmdHis') . '.xlsx');
     }
 
     public function verifikasiOperator($id){

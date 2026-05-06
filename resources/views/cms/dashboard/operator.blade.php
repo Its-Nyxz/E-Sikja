@@ -78,7 +78,46 @@
         </div>
     </div>
 
-    <!-- Content Row -->
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary mb-2">Statistik Pengajuan</h6>
+                    <div class="d-flex align-items-center flex-wrap">
+                        <input type="date" id="chart-req-start" class="form-control form-control-sm mr-2 mb-2" style="max-width: 130px; margin-right: 5px;">
+                        <span class="mr-2 mb-2" style="margin-right: 5px;">-</span>
+                        <input type="date" id="chart-req-end" class="form-control form-control-sm mr-2 mb-2" style="max-width: 130px; margin-right: 5px;">
+                        <button id="btn-filter-req" class="btn btn-sm btn-primary mb-2">Filter</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area" style="height: 300px; position: relative;">
+                        <canvas id="requestChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success mb-2">Statistik Pengaduan</h6>
+                    <div class="d-flex align-items-center flex-wrap">
+                        <input type="date" id="chart-comp-start" class="form-control form-control-sm mr-2 mb-2" style="max-width: 130px; margin-right: 5px;">
+                        <span class="mr-2 mb-2" style="margin-right: 5px;">-</span>
+                        <input type="date" id="chart-comp-end" class="form-control form-control-sm mr-2 mb-2" style="max-width: 130px; margin-right: 5px;">
+                        <button id="btn-filter-comp" class="btn btn-sm btn-success mb-2">Filter</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area" style="height: 300px; position: relative;">
+                        <canvas id="complaintChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Pengajuan Terbaru -->
         <div class="col-lg-6">
@@ -224,9 +263,120 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     $(document).ready(function() {
-        // Initialize any necessary JavaScript components here
+        // Set default date range: 30 hari terakhir
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 29);
+
+        const formatDate = (d) => d.toISOString().split('T')[0];
+        const defaultStart = formatDate(thirtyDaysAgo);
+        const defaultEnd = formatDate(today);
+
+        $('#chart-req-start').val(defaultStart);
+        $('#chart-req-end').val(defaultEnd);
+        $('#chart-comp-start').val(defaultStart);
+        $('#chart-comp-end').val(defaultEnd);
+
+        let requestChart = null;
+        let complaintChart = null;
+
+        const commonOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false, drawBorder: false } },
+                y: {
+                    ticks: { beginAtZero: true, stepSize: 1 },
+                    grid: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }
+            }
+        };
+
+        function fetchRequestChart() {
+            const startDate = $('#chart-req-start').val();
+            const endDate = $('#chart-req-end').val();
+
+            $.ajax({
+                url: "{{ route('dashboard.chart-data') }}",
+                type: "GET",
+                data: { type: 'request', start_date: startDate, end_date: endDate },
+                success: function(response) {
+                    if (requestChart) requestChart.destroy();
+                    const ctxReq = document.getElementById('requestChart').getContext('2d');
+                    requestChart = new Chart(ctxReq, {
+                        type: 'line',
+                        data: {
+                            labels: response.labels,
+                            datasets: [{
+                                label: 'Total Pengajuan',
+                                data: response.data,
+                                borderColor: '#4e73df',
+                                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                                pointBackgroundColor: '#4e73df',
+                                pointBorderColor: '#fff',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: commonOptions
+                    });
+                }
+            });
+        }
+
+        function fetchComplaintChart() {
+            const startDate = $('#chart-comp-start').val();
+            const endDate = $('#chart-comp-end').val();
+
+            $.ajax({
+                url: "{{ route('dashboard.chart-data') }}",
+                type: "GET",
+                data: { type: 'complaint', start_date: startDate, end_date: endDate },
+                success: function(response) {
+                    if (complaintChart) complaintChart.destroy();
+                    const ctxComp = document.getElementById('complaintChart').getContext('2d');
+                    complaintChart = new Chart(ctxComp, {
+                        type: 'line',
+                        data: {
+                            labels: response.labels,
+                            datasets: [{
+                                label: 'Total Pengaduan',
+                                data: response.data,
+                                borderColor: '#1cc88a',
+                                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                                pointBackgroundColor: '#1cc88a',
+                                pointBorderColor: '#fff',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: commonOptions
+                    });
+                }
+            });
+        }
+
+        // Init charts
+        fetchRequestChart();
+        fetchComplaintChart();
+
+        // Filter buttons
+        $('#btn-filter-req').on('click', function() {
+            fetchRequestChart();
+        });
+        $('#btn-filter-comp').on('click', function() {
+            fetchComplaintChart();
+        });
     });
 </script>
 @endpush

@@ -141,6 +141,7 @@
                         <input type="file" class="form-control @error('documents.'.str_replace(' ', '_', strtolower($document))) is-invalid @enderror" 
                             id="document_{{ str_replace(' ', '_', strtolower($document)) }}" 
                             name="documents[{{ $index }}]" 
+                            accept="image/*"
                             {{ (str_contains($document, '(Optional)') || isset($requestLetter)) ? '' : 'required' }}>
                         @error('documents.'.str_replace(' ', '_', strtolower($document)))
                             <div class="invalid-feedback">{{ $message }}</div>

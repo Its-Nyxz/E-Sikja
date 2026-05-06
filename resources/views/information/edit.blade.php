@@ -55,7 +55,7 @@
                                     @endif
                                     <div class="custom-file">
                                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                                            id="image" name="image">
+                                            id="image" name="image" accept="image/*">
                                     </div>
                                     <small class="form-text text-muted">Biarkan kosong jika tidak ingin mengubah gambar</small>
                                     @error('image')

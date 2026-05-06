@@ -89,5 +89,58 @@ class DashboardController extends Controller
         return view('cms.dashboard.resident')->with($data);
     }
 
-    
+    public function chartData(Request $request)
+    {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'operator') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $type = $request->input('type');
+        $startDate = $request->input('start_date', now()->subDays(29)->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->format('Y-m-d'));
+        $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+        
+        $labels = [];
+        $data = [];
+
+        if ($type === 'request') {
+            $records = RequestLetter::selectRaw('DATE(created_at) as chart_date, COUNT(*) as total')
+                ->whereDate('created_at', '>=', $startDate)
+                ->whereDate('created_at', '<=', $endDate)
+                ->groupByRaw('DATE(created_at)')
+                ->orderByRaw('DATE(created_at) asc')
+                ->get()
+                ->keyBy('chart_date')
+                ->map(function ($item) {
+                    return $item->total;
+                })
+                ->toArray();
+        } else if ($type === 'complaint') {
+            $records = Complaint::selectRaw('DATE(created_at) as chart_date, COUNT(*) as total')
+                ->whereDate('created_at', '>=', $startDate)
+                ->whereDate('created_at', '<=', $endDate)
+                ->groupByRaw('DATE(created_at)')
+                ->orderByRaw('DATE(created_at) asc')
+                ->get()
+                ->keyBy('chart_date')
+                ->map(function ($item) {
+                    return $item->total;
+                })
+                ->toArray();
+        } else {
+            return response()->json(['error' => 'Invalid type'], 400);
+        }
+
+        foreach ($period as $dateObj) {
+            $dateString = $dateObj->format('Y-m-d');
+            $labels[] = $dateObj->format('d M Y');
+            $data[] = $records[$dateString] ?? 0;
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data
+        ]);
+    }
+
 }

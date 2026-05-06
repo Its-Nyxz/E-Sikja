@@ -245,7 +245,7 @@ $(document).ready(function() {
             {data: 'status', name: 'status'},
             {data: 'action', name: 'action', orderable: false, searchable: false}
         ],
-        order: [[3, 'desc']]
+        order: [[3, 'asc']]
     });
 
     $('#status-filter').change(function() {

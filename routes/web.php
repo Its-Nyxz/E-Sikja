@@ -75,6 +75,7 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('dashboard/chart-data', [DashboardController::class, 'chartData'])->name('dashboard.chart-data');
     Route::get('pengaduan-saya/check', [DashboardController::class, 'checkComplaintStatus'])->name('pengaduan-saya.check');
     Route::prefix('data-masyarakat')->group(function () {
         Route::get('/', [ResidentController::class, 'index'])->name('data-masyarakat.index');
@@ -107,6 +108,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('data-pengajuan')->group(function () {
         Route::get('/', [RequestController::class, 'index'])->name('data-pengajuan.index');
+        Route::get('/export-excel', [RequestController::class, 'exportExcel'])->name('data-pengajuan.export');
         Route::get('show/{id}', [RequestController::class, 'show'])->name('data-pengajuan.show');
         Route::get('/print/{id}', [RequestController::class, 'print'])->name('data-pengajuan.print');
 
@@ -143,6 +145,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('data-pengaduan')->group(function () {
         Route::get('/', [ComplaintController::class, 'index'])->name('data-pengaduan.index');
+        Route::get('/export-excel', [ComplaintController::class, 'exportExcel'])->name('data-pengaduan.export');
         Route::get('/show/{id}', [ComplaintController::class, 'show'])->name('data-pengaduan.show');
         Route::get('verifikasi-operator/{id}', [ComplaintController::class, 'verifikasiOperator'])->name('data-pengaduan.verifikasi-operator');
         Route::post('verifikasi-process/{id}', [ComplaintController::class, 'verifikasiProcess'])->name('data-pengaduan.verifikasi-process');

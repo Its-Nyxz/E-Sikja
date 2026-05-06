@@ -37,12 +37,23 @@ class MyRequestController extends Controller
     {
          if ($request->ajax()) {
             $status = $request->status;
+            // Capitalize status from JS tab ID to match DB enum values
+            $statusFilter = $status && $status != 'semua' ? ucfirst($status) : null;
             
-            $query = RequestLetter::where('user_id', auth()->id());
-            if ($status != 'semua') {
-                $query =$query->where('status', $status);
+            $query = RequestLetter::with(['requestType'])->where('user_id', auth()->id());
+            if ($statusFilter) {
+                $query = $query->where('status', $statusFilter);
             }
-            $query =$query->orderBy('created_at', 'desc');
+            if ($request->date_from) {
+                $query = $query->whereDate('created_at', '>=', $request->date_from);
+            }
+            if ($request->date_to) {
+                $query = $query->whereDate('created_at', '<=', $request->date_to);
+            }
+            if ($request->request_type_id) {
+                $query = $query->where('request_type_id', $request->request_type_id);
+            }
+            $query = $query->orderBy('created_at', 'asc');
 
             return DataTables::of($query)
                 ->addIndexColumn()
@@ -71,7 +82,8 @@ class MyRequestController extends Controller
                 ->make(true);
         }
         return view('cms.my-request.index', [
-            'title' => 'Pengajuan Saya'
+            'title'        => 'Pengajuan Saya',
+            'requestTypes' => \App\Models\RequestType::where('status', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -93,6 +105,10 @@ class MyRequestController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'documents.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         DB::beginTransaction();
         try {
             $data = $request->all();
@@ -102,10 +118,10 @@ class MyRequestController extends Controller
             // dd($data);
            
 
-            $code = "REQ/$requestType->code/".date('y')."/".date('m')."/".date('d');
-            $requestLetterLast = RequestLetter::where('code', 'like', "$code%")->latest()->first();
-            $lastNumber = $requestLetterLast ? intval(substr($requestLetterLast->code, -3)) + 1 : 1;
-            $code .= '/'.str_pad($lastNumber, 3, '0', STR_PAD_LEFT);
+            $baseCode = $requestType->code;
+            $requestLetterLast = RequestLetter::where('code', 'like', "$baseCode-%")->orderBy('id', 'desc')->first();
+            $lastNumber = $requestLetterLast ? intval(substr($requestLetterLast->code, -4)) + 1 : 1;
+            $code = $baseCode . '-' . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
             
             // Create request letter
             $requestLetter = RequestLetter::create([
@@ -204,6 +220,10 @@ class MyRequestController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'documents.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         DB::beginTransaction();
         try {
             $data = $request->all();

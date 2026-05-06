@@ -138,75 +138,91 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <div class="login-container">
-                    <div class="logo">
-                        <i class="fas fa-envelope-open-text fa-3x text-primary"></i>
-                    </div>
-                    <h3 class="login-title">{{ $setting['website_description'] }}</h3>
+    <div class="login-container">
+        <div class="logo">
+            <i class="fas fa-envelope-open-text fa-3x text-primary"></i>
+        </div>
+        <h3 class="login-title">{{ $setting['website_description'] }}</h3>
 
-                    {{-- ✅ ALERT ERROR / SUCCESS --}}
-                    @if (session('error'))
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            {{ session('error') }}
-                        </div>
-                    @endif
-                    @if (session('success'))
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle me-2"></i>
-                            {{ session('success') }}
-                        </div>
-                    @endif
+        {{-- ✅ ALERT ERROR / SUCCESS --}}
+        @if (session('error'))
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ session('error') }}
+            </div>
+        @endif
+        @if (session('success'))
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+            </div>
+        @endif
 
-                    {{-- ✅ ALERT COUNTDOWN --}}
-                    @if (isset($isLocked) && $isLocked)
-                        <div class="alert alert-warning">
-                            <i class="fas fa-clock me-2"></i>
-                            Terlalu banyak percobaan gagal. Silakan coba lagi dalam
-                            <strong id="countdown">{{ $remainingSeconds }}</strong> detik.
-                        </div>
-                    @endif
+        {{-- ✅ ALERT COUNTDOWN --}}
+        @if (isset($isLocked) && $isLocked)
+            <div class="alert alert-warning">
+                <i class="fas fa-clock me-2"></i>
+                Terlalu banyak percobaan gagal. Silakan coba lagi dalam
+                <strong id="countdown">{{ $remainingSeconds }}</strong> detik.
+            </div>
+        @endif
 
-                    {{-- ✅ FORM LOGIN --}}
-                    <form action="{{ route('login') }}" method="POST">
-                        @csrf
-                        <div class="mb-4">
-                            <label for="username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                <input type="text" class="form-control" id="username" name="username"
-                                    value="{{ old('username') }}" placeholder="Masukkan username Anda" required>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" class="form-control" id="password" name="password"
-                                    placeholder="Masukkan password Anda" required>
-                            </div>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-sign-in-alt me-2"></i>Login
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="footer-links">
-                        <p class="mb-2">Belum punya akun? <a href="{{ route('register') }}">Daftar</a></p>
-                        <p class="mb-0"><a href="{{ route('auth.forgot-password') }}">Lupa Password?</a></p>
-                    </div>
+        {{-- ✅ FORM LOGIN --}}
+        <form action="{{ route('login') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label for="username" class="form-label">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" class="form-control" id="username" name="username"
+                        value="{{ old('username') }}" placeholder="Masukkan username Anda" required>
                 </div>
             </div>
+            <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Masukkan password Anda" required>
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword" 
+                        style="border: 2px solid #e9ecef; border-left: none; border-radius: 0 8px 8px 0; background-color: #f8f9fa;">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </div>
+        </form>
+
+        <div class="footer-links">
+            <p class="mb-2">Belum punya akun? <a href="{{ route('register') }}">Daftar</a></p>
+            <p class="mb-0"><a href="{{ route('auth.forgot-password') }}">Lupa Password?</a></p>
         </div>
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    {{-- ✅ SCRIPT TOGGLE PASSWORD --}}
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
 
     {{-- ✅ SCRIPT COUNTDOWN --}}
     @if (isset($isLocked) && $isLocked)

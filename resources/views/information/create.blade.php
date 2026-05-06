@@ -48,7 +48,7 @@
                                     <label for="image">Gambar</label>
                                     <div class="custom-file">
                                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                                            id="image" name="image">
+                                            id="image" name="image" accept="image/*">
                                     </div>
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
