@@ -148,7 +148,7 @@ class RequestController extends Controller
             ];
             // Create history
             if ($status == 'Ditolak') {
-                $notes = 'Pengajuan ditolak oleh '.Auth::user()->name.'.' . ($request->notes ? ' dengan catatan: ' . $request->notes : '');
+                $notes = "Pengajuan ditolak oleh petugas (" . Auth::user()->name . ")." . ($request->notes ? " Catatan: " . $request->notes : "");
             } else if ($status == 'Selesai') {
                 $typeCode = $requestLetter->requestType->code;
                 $documentNumber = "$typeCode/" . date('y') . "/" . date('m') . "/" . date('d');
@@ -156,9 +156,11 @@ class RequestController extends Controller
                 $lastNumber = $getLast ? intval(substr($getLast->document_number, -3)) + 1 : 1;
                 $documentNumber .= '/' . str_pad($lastNumber, 3, '0', STR_PAD_LEFT);
                 $data['document_number'] = $documentNumber;
-                $notes = 'Pengajuan selesai diverifikasi '.Auth::user()->name.'.' . ($request->notes ? ' dengan catatan: ' . $request->notes : '');
+                $notes = "Pengajuan telah selesai diverifikasi oleh petugas (" . Auth::user()->name . ") dan dokumen sudah dapat dicetak." . ($request->notes ? " Catatan: " . $request->notes : "");
+            } else if ($status == 'Diproses') {
+                $notes = "Pengajuan telah diverifikasi oleh petugas (" . Auth::user()->name . ") dan sedang diteruskan ke Admin untuk diproses." . ($request->notes ? " Catatan: " . $request->notes : "");
             } else {
-                $notes = 'Pengajuan diteruskan ke admin.' . ($request->notes ? ' dengan catatan: ' . $request->notes : '');
+                $notes = "Status pengajuan diperbarui menjadi " . $status . " oleh petugas (" . Auth::user()->name . ")." . ($request->notes ? " Catatan: " . $request->notes : "");
             }
             $requestLetter->update($data);
 
