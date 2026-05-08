@@ -157,6 +157,7 @@ class MyRequestController extends Controller
             HistoryRequestLetter::create([
                 'request_letter_id' => $requestLetter->id,
                 'status' => 'Diajukan',
+                'notes' => 'Pengajuan berhasil dikirimkan dan sedang menunggu proses verifikasi awal oleh petugas.'
             ]);
 
             // Send notification
