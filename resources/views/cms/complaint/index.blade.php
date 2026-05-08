@@ -40,6 +40,63 @@
         border-radius: 50%;
         margin-right: 4px;
     }
+    
+    /* Timeline styling */
+    .complaint-timeline {
+        position: relative;
+        padding-left: 30px;
+        margin-top: 10px;
+    }
+    .complaint-timeline::before {
+        content: '';
+        position: absolute;
+        left: 7px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 20px;
+    }
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    .timeline-dot {
+        position: absolute;
+        left: -30px;
+        top: 4px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #0d6efd;
+        z-index: 1;
+    }
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #718096;
+        font-weight: 500;
+    }
+    .timeline-note {
+        font-size: 0.875rem;
+        color: #4a5568;
+        line-height: 1.5;
+    }
 </style>
 
 <div class="container-fluid">
@@ -210,18 +267,7 @@
                                 <h6 class="card-title mb-0">Riwayat Status</h6>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th width="20%">Tanggal</th>
-                                                <th width="15%">Status</th>
-                                                <th>Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="modal-histories">
-                                        </tbody>
-                                    </table>
+                                <div id="modal-histories" class="complaint-timeline">
                                 </div>
                             </div>
                         </div>
@@ -376,23 +422,42 @@ $(document).ready(function () {
                     $('#modal-image').html('<p class="text-muted">Tidak ada foto</p>');
                 }
                 
-                // Fill histories with badges
+                // Fill histories with timeline items
                 var historyHtml = '';
                 histories.forEach(function(history) {
                     var historyBadgeClass = '';
+                    var dotColor = '';
                     switch (history.status) {
-                        case 'Diajukan': historyBadgeClass = 'warning'; break;
-                        case 'Diproses': historyBadgeClass = 'primary'; break;
-                        case 'Ditolak':  historyBadgeClass = 'danger';  break;
-                        case 'Selesai':  historyBadgeClass = 'success'; break;
+                        case 'Diajukan': historyBadgeClass = 'warning text-dark'; dotColor = '#ffc107'; break;
+                        case 'Diproses': historyBadgeClass = 'primary'; dotColor = '#0d6efd'; break;
+                        case 'Ditolak':  historyBadgeClass = 'danger';  dotColor = '#dc3545'; break;
+                        case 'Selesai':  historyBadgeClass = 'success'; dotColor = '#198754'; break;
                     }
                     
-                    historyHtml += '<tr>' +
-                        '<td>' + moment(history.date).format('DD-MM-YYYY HH:mm') + '</td>' +
-                        '<td><span class="badge bg-' + historyBadgeClass + '">' + history.status + '</span></td>' +
-                        '<td>' + history.note + '</td>' +
-                        '</tr>';
+                    // Sanitize old unprofessional notes if they exist
+                    var sanitizedNote = history.note;
+                    if (sanitizedNote && sanitizedNote.includes("(Diproses == 'Ditolak' ?? 'diverifikasi')")) {
+                        sanitizedNote = sanitizedNote.replace("(Diproses == 'Ditolak' ?? 'diverifikasi')", history.status === 'Ditolak' ? 'ditolak' : 'diverifikasi');
+                    }
+                    
+                    historyHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-dot" style="border-color: ${dotColor}"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <span class="badge bg-${historyBadgeClass}">${history.status}</span>
+                                    <span class="timeline-date"><i class="far fa-clock me-1"></i>${moment(history.date).format('DD-MM-YYYY HH:mm')}</span>
+                                </div>
+                                <div class="timeline-note">${sanitizedNote}</div>
+                            </div>
+                        </div>
+                    `;
                 });
+                
+                if (histories.length === 0) {
+                    historyHtml = '<p class="text-center text-muted my-3">Belum ada riwayat status</p>';
+                }
+                
                 $('#modal-histories').html(historyHtml);
                 
                 // Show modal
