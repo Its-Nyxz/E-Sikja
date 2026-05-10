@@ -26,17 +26,17 @@ class RequestController extends Controller
     {
         if ($request->ajax()) {
             $query = RequestLetter::with(['user', 'requestType'])
-                ->when($request->status && $request->status != 'semua', function($q) use ($request) {
+                ->when($request->status && $request->status != 'semua', function ($q) use ($request) {
                     // Capitalize status from JS tab ID to match DB enum (e.g. 'diajukan' -> 'Diajukan')
                     return $q->where('status', ucfirst($request->status));
                 })
-                ->when($request->date_from, function($q) use ($request) {
+                ->when($request->date_from, function ($q) use ($request) {
                     return $q->whereDate('created_at', '>=', $request->date_from);
                 })
-                ->when($request->date_to, function($q) use ($request) {
+                ->when($request->date_to, function ($q) use ($request) {
                     return $q->whereDate('created_at', '<=', $request->date_to);
                 })
-                ->when($request->request_type_id, function($q) use ($request) {
+                ->when($request->request_type_id, function ($q) use ($request) {
                     return $q->where('request_type_id', $request->request_type_id);
                 });
             // if (Auth::user()->role == 'admin') {
@@ -47,29 +47,29 @@ class RequestController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->editColumn('created_at', function($row) {
+                ->editColumn('created_at', function ($row) {
                     return date('d-m-Y', strtotime($row->created_at));
                 })
-                ->addColumn('request_type', function($row) {
+                ->addColumn('request_type', function ($row) {
                     return $row->requestType->name;
                 })
-                ->addColumn('action', function($row) {
+                ->addColumn('action', function ($row) {
                     $actionBtn = '';
-                    
+
                     if (($row->status == 'Diajukan' && Auth::user()->role == 'operator') || ($row->status == 'Diproses' && Auth::user()->role == 'admin')) {
-                        $actionBtn = '<a href="'.route('data-pengajuan.verifikasi-'.Auth::user()->role, $row->id).'" class="btn btn-sm btn-primary">
+                        $actionBtn = '<a href="' . route('data-pengajuan.verifikasi-' . Auth::user()->role, $row->id) . '" class="btn btn-sm btn-primary">
                             <i class="fas fa-check"></i> Verifikasi
                         </a>';
-                    }elseif ($row->status == 'Selesai' && Auth::user()->role == 'admin') {
-                        $actionBtn = '<a target="_blank" href="'.route('data-pengajuan.print', $row->id).'" class="btn btn-sm btn-success">
+                    } elseif ($row->status == 'Selesai' && Auth::user()->role == 'admin') {
+                        $actionBtn = '<a target="_blank" href="' . route('data-pengajuan.print', $row->id) . '" class="btn btn-sm btn-success">
                             <i class="fas fa-print"></i> Print
                         </a>';
                     } else {
-                        $actionBtn = '<a href="'.route('data-pengajuan.show', $row->id).'" class="btn btn-sm btn-info">
+                        $actionBtn = '<a href="' . route('data-pengajuan.show', $row->id) . '" class="btn btn-sm btn-info">
                             <i class="fas fa-eye"></i> Detail
                         </a>';
                     }
-                    
+
                     return $actionBtn;
                 })
                 ->rawColumns(['action', 'status'])
@@ -88,20 +88,22 @@ class RequestController extends Controller
     {
         $filters = $request->only(['status', 'date_from', 'date_to', 'request_type_id']);
         $role = Auth::user()->role;
-        
+
         return Excel::download(new RequestExport($filters, $role), 'Data_Pengajuan_' . date('YmdHis') . '.xlsx');
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $data = [
-          'title' => 'Detail Pengajuan',
-          'requestLetter' => RequestLetter::find($id)
+            'title' => 'Detail Pengajuan',
+            'requestLetter' => RequestLetter::find($id)
         ];
 
         return view('cms.request.show', $data);
     }
 
-    public function verifikasiOperator($id){
+    public function verifikasiOperator($id)
+    {
         if (Auth::user()->role != 'operator') {
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
@@ -110,14 +112,15 @@ class RequestController extends Controller
             return redirect('dashboard')->with('error', 'Pengajuan tidak dapat diverifikasi')->send();
         }
         $data = [
-          'title' => 'Verifikasi Operator',
-          'requestLetter' => $requestLetter
+            'title' => 'Verifikasi Operator',
+            'requestLetter' => $requestLetter
         ];
 
         return view('cms.request.verifikasi-operator', $data);
     }
 
-    public function verifikasiAdmin($id){
+    public function verifikasiAdmin($id)
+    {
         if (Auth::user()->role != 'admin') {
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
@@ -126,8 +129,8 @@ class RequestController extends Controller
             return redirect('dashboard')->with('error', 'Pengajuan tidak dapat diverifikasi')->send();
         }
         $data = [
-          'title' => 'Verifikasi Admin',
-          'requestLetter' => $requestLetter
+            'title' => 'Verifikasi Admin',
+            'requestLetter' => $requestLetter
         ];
 
         return view('cms.request.verifikasi-admin', $data);
@@ -140,9 +143,9 @@ class RequestController extends Controller
             $status = $request->status;
 
             $requestLetter = RequestLetter::findOrFail($id);
-            
+
             // Update request letter status
-            
+
             $data = [
                 'status' => $status
             ];
@@ -170,20 +173,20 @@ class RequestController extends Controller
                 'notes' =>  $notes
             ]);
 
-            if($status == 'Diproses'){
+            if ($status == 'Diproses') {
                 $admins = User::where('role', 'admin')->get();
-    
+
                 foreach ($admins as $admin) {
                     // Send notification to admin
                     Notification::create([
                         'type' => 'Pengajuan',
                         'user_id' => $admin->id,
                         'title' => 'Update Status Pengajuan ' . $requestLetter->requestType->name,
-                        'text' => 'Pengajuan dengan nomor ' . $requestLetter->code . ' telah ' . strtolower($request->status). ' oleh operator',
+                        'text' => 'Pengajuan dengan nomor ' . $requestLetter->code . ' telah ' . strtolower($request->status) . ' oleh operator',
                         'link' => '/data-pengajuan/verifikasi-admin/' . $requestLetter->id
                     ]);
                 }
-            }else{
+            } else {
                 Notification::create([
                     'type' => 'Pengajuan',
                     'user_id' => $requestLetter->user_id,
@@ -193,7 +196,7 @@ class RequestController extends Controller
                 ]);
             }
             // dd($requestLetter);
-            
+
 
             // Send notification to user
             // Notification::create([
@@ -215,10 +218,28 @@ class RequestController extends Controller
 
     public function print($id)
     {
-        $requestLetter = RequestLetter::findOrFail($id);
+        $requestLetter = RequestLetter::with([
+            'requestType',
+            'user.resident',
+            'historyRequestLetters'
+        ])->findOrFail($id);
+
         if ($requestLetter->status != 'Selesai') {
             return redirect()->back()->with('error', 'Pengajuan belum selesai');
         }
+
+        if (!$requestLetter->user) {
+            return redirect()->back()->with('error', 'Data user/pemohon tidak ditemukan. Dokumen tidak dapat dicetak.');
+        }
+
+        if (!$requestLetter->user->resident) {
+            return redirect()->back()->with('error', 'Data kependudukan pemohon belum lengkap. Dokumen tidak dapat dicetak.');
+        }
+
+        if (!$requestLetter->requestType) {
+            return redirect()->back()->with('error', 'Jenis pengajuan tidak ditemukan. Dokumen tidak dapat dicetak.');
+        }
+
         $data = [
             'title' => 'Print Pengajuan',
             'requestLetter' => $requestLetter,
@@ -228,9 +249,11 @@ class RequestController extends Controller
             'data' => json_decode($requestLetter->data)
         ];
 
-        $pdf = PDF::loadView('cms.my-request.print.'.strtolower($data['requestType']->code), $data)
+        $pdf = PDF::loadView('cms.my-request.print.' . strtolower($data['requestType']->code), $data)
             ->setPaper('a4');
+
         $filename = 'pengajuan-' . str_replace(['/', '\\'], '-', $requestLetter->code) . '.pdf';
+
         return $pdf->stream($filename);
     }
 }
