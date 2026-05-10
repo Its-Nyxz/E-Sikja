@@ -1,254 +1,453 @@
 @extends('layouts.cms')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title"></h3>
-                    <a href="{{ route('data-pengajuan.index') }}" class="btn btn-sm btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Kembali
-                    </a>
-                </div>
-                <div class="card-body">
-                    @if($requestLetter)
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card shadow-sm mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title border-bottom pb-2 mb-4">Informasi Pengajuan</h5>
-                                        <div class="row mb-3">
-                                            <div class="col-md-5 fw-bold">Nomor Pengajuan</div>
-                                            <div class="col-md-7">{{ $requestLetter->code }}</div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-5 fw-bold">Jenis Pengajuan</div>
-                                            <div class="col-md-7">{{ $requestLetter->requestType->name }}</div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-5 fw-bold">Status</div>
-                                            <div class="col-md-7">
-                                                <span class="badge bg-{{ $requestLetter->status == 'Diajukan' ? 'warning' : ($requestLetter->status == 'Diproses' ? 'info' : ($requestLetter->status == 'Selesai' ? 'success' : 'danger')) }}">
-                                                    {{ $requestLetter->status }}
-                                                </span>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title"></h3>
+                        <a href="{{ route('data-pengajuan.index') }}" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        @if ($requestLetter)
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title border-bottom pb-2 mb-4">Informasi Pengajuan</h5>
+                                            <div class="row mb-3">
+                                                <div class="col-md-5 fw-bold">Nomor Pengajuan</div>
+                                                <div class="col-md-7">{{ $requestLetter->code }}</div>
                                             </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-5 fw-bold">Tanggal Pengajuan</div>
-                                            <div class="col-md-7">{{ date('d-m-Y H:i', strtotime($requestLetter->created_at)) }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card shadow-sm mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title border-bottom pb-2 mb-4">Data Pemohon</h5>
-                                        <div class="row mb-3">
-                                            <div class="col-md-5 fw-bold">Nama</div>
-                                            <div class="col-md-7">{{ $requestLetter->user->name }}</div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-5 fw-bold">NIK</div>
-                                            <div class="col-md-7">{{ $requestLetter->user->resident->nik }}</div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-5 fw-bold">Alamat</div>
-                                            <div class="col-md-7">{{ $requestLetter->user->resident->address }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card shadow-sm mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title border-bottom pb-2 mb-4">Data Pengajuan</h5>
-                                        @php
-                                            $exclude = ['request_type_id', 'village_head', 'village_head_position'];
-                                        @endphp
-                                        @foreach(json_decode($requestLetter->data) as $key => $value)
-                                            @if(!in_array($key, $exclude))
-                                                @if(str_contains($key, 'date') || str_contains($key, 'dob'))
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-5 fw-bold">{{ __('request-letter.' . $key) }}</div>
-                                                        <div class="col-md-7">{{ date('d-M-Y', strtotime($value)) }}</div>
-                                                    </div>
-                                                @else
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-5 fw-bold">{{ __('request-letter.' . $key) }}</div>
-                                                        <div class="col-md-7">{{ $value }}</div>
-                                                    </div>
-                                                @endif
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card shadow-sm mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title border-bottom pb-2 mb-4">Dokumen Lampiran</h5>
-                                        @foreach($requestLetter->documentRequestLetters as $index => $document)
-                                            <div class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded">
-                                                <div>
-                                                    <span class="badge bg-primary me-2">{{ $index + 1 }}</span>
-                                                    <span class="fw-medium">{{ $document->name }}</span>
+                                            <div class="row mb-3">
+                                                <div class="col-md-5 fw-bold">Jenis Pengajuan</div>
+                                                <div class="col-md-7">{{ $requestLetter->requestType->name }}</div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-5 fw-bold">Status</div>
+                                                <div class="col-md-7">
+                                                    <span
+                                                        class="badge bg-{{ $requestLetter->status == 'Diajukan' ? 'warning' : ($requestLetter->status == 'Diproses' ? 'info' : ($requestLetter->status == 'Selesai' ? 'success' : 'danger')) }}">
+                                                        {{ $requestLetter->status }}
+                                                    </span>
                                                 </div>
-                                                <a href="{{ asset( $document->url) }}" target="_blank" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-eye"></i> Lihat
-                                                </a>
                                             </div>
-                                        @endforeach
+                                            <div class="row mb-3">
+                                                <div class="col-md-5 fw-bold">Tanggal Pengajuan</div>
+                                                <div class="col-md-7">
+                                                    {{ date('d-m-Y H:i', strtotime($requestLetter->created_at)) }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title border-bottom pb-2 mb-4">Data Pemohon</h5>
+                                            <div class="row mb-3">
+                                                <div class="col-md-5 fw-bold">Nama</div>
+                                                <div class="col-md-7">{{ $requestLetter->user->name }}</div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-5 fw-bold">NIK</div>
+                                                <div class="col-md-7">{{ $requestLetter->user->resident->nik }}</div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-5 fw-bold">Alamat</div>
+                                                <div class="col-md-7">{{ $requestLetter->user->resident->address }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title border-bottom pb-2 mb-4">Data Pengajuan</h5>
+                                            @php
+                                                $exclude = ['request_type_id', 'village_head', 'village_head_position'];
+                                            @endphp
+                                            @foreach (json_decode($requestLetter->data) as $key => $value)
+                                                @if (!in_array($key, $exclude))
+                                                    @if (str_contains($key, 'date') || str_contains($key, 'dob'))
+                                                        <div class="row mb-3">
+                                                            <div class="col-md-5 fw-bold">{{ __('request-letter.' . $key) }}
+                                                            </div>
+                                                            <div class="col-md-7">{{ date('d-M-Y', strtotime($value)) }}
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <div class="row mb-3">
+                                                            <div class="col-md-5 fw-bold">
+                                                                {{ __('request-letter.' . $key) }}</div>
+                                                            <div class="col-md-7">{{ $value }}</div>
+                                                        </div>
+                                                    @endif
+                                                @endif
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="card shadow-sm mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title border-bottom pb-2 mb-4">Riwayat Status</h5>
-                                        <div class="complaint-timeline">
-                                            @foreach($requestLetter->historyRequestLetters as $history)
+                                <div class="col-md-6">
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title border-bottom pb-2 mb-4">Dokumen Lampiran</h5>
+                                            @foreach ($requestLetter->documentRequestLetters as $index => $document)
                                                 @php
-                                                    $badgeClass = '';
-                                                    $dotColor = '';
-                                                    switch ($history->status) {
-                                                        case 'Diajukan': $badgeClass = 'warning text-dark'; $dotColor = '#ffc107'; break;
-                                                        case 'Diproses': $badgeClass = 'primary'; $dotColor = '#0d6efd'; break;
-                                                        case 'Ditolak':  $badgeClass = 'danger';  $dotColor = '#dc3545'; break;
-                                                        case 'Selesai':  $badgeClass = 'success'; $dotColor = '#198754'; break;
-                                                    }
+                                                    $fileUrl = asset($document->url);
+                                                    $extension = strtolower(
+                                                        pathinfo(
+                                                            parse_url($document->url, PHP_URL_PATH),
+                                                            PATHINFO_EXTENSION,
+                                                        ),
+                                                    );
                                                 @endphp
-                                                <div class="timeline-item">
-                                                    <div class="timeline-dot" style="border-color: {{ $dotColor }}"></div>
-                                                    <div class="timeline-content">
-                                                        <div class="timeline-header">
-                                                            <span class="badge bg-{{ $badgeClass }}">{{ $history->status }}</span>
-                                                            <span class="timeline-date"><i class="far fa-clock me-1"></i>{{ date('d-m-Y H:i', strtotime($history->created_at)) }}</span>
-                                                        </div>
-                                                        @if($history->notes)
-                                                            <div class="timeline-note">{{ $history->notes }}</div>
-                                                        @endif
+
+                                                <div
+                                                    class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded">
+                                                    <div>
+                                                        <span class="badge bg-primary me-2">{{ $index + 1 }}</span>
+                                                        <span class="fw-medium">{{ $document->name }}</span>
                                                     </div>
+
+                                                    <button type="button" class="btn btn-sm btn-info btn-preview-document"
+                                                        data-bs-toggle="modal" data-bs-target="#documentPreviewModal"
+                                                        data-title="{{ $document->name }}" data-url="{{ $fileUrl }}"
+                                                        data-extension="{{ $extension }}">
+                                                        <i class="fas fa-eye"></i> Lihat
+                                                    </button>
                                                 </div>
                                             @endforeach
-                                            
-                                            @if($requestLetter->historyRequestLetters->isEmpty())
-                                                <p class="text-center text-muted my-3">Belum ada riwayat status</p>
-                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="modal fade" id="documentPreviewModal" tabindex="-1"
+                                        aria-labelledby="documentPreviewModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl modal-dialog-centered">
+                                            <div class="modal-content preview-modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="documentPreviewModalLabel">Preview Dokumen
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Tutup"></button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <div id="previewImageWrapper" class="protected-preview-wrapper d-none"
+                                                        data-watermark="{{ $requestLetter->code ?? 'DOKUMEN' }}"
+                                                        oncontextmenu="return false;">
+
+                                                        <img id="previewImage" src="" alt="Preview Dokumen"
+                                                            class="protected-image" draggable="false">
+                                                    </div>
+
+                                                    <div id="previewPdfWrapper" class="d-none">
+                                                        <iframe id="previewPdf" src="" class="preview-pdf"></iframe>
+                                                    </div>
+
+                                                    <div id="previewUnsupported" class="alert alert-warning d-none mb-0">
+                                                        File ini tidak dapat dipreview langsung. Format file tidak didukung
+                                                        untuk preview.
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <small class="text-muted me-auto">
+                                                        Dokumen hanya untuk preview.
+                                                    </small>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">
+                                                        Tutup
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title border-bottom pb-2 mb-4">Riwayat Status</h5>
+                                            <div class="complaint-timeline">
+                                                @foreach ($requestLetter->historyRequestLetters as $history)
+                                                    @php
+                                                        $badgeClass = '';
+                                                        $dotColor = '';
+                                                        switch ($history->status) {
+                                                            case 'Diajukan':
+                                                                $badgeClass = 'warning text-dark';
+                                                                $dotColor = '#ffc107';
+                                                                break;
+                                                            case 'Diproses':
+                                                                $badgeClass = 'primary';
+                                                                $dotColor = '#0d6efd';
+                                                                break;
+                                                            case 'Ditolak':
+                                                                $badgeClass = 'danger';
+                                                                $dotColor = '#dc3545';
+                                                                break;
+                                                            case 'Selesai':
+                                                                $badgeClass = 'success';
+                                                                $dotColor = '#198754';
+                                                                break;
+                                                        }
+                                                    @endphp
+                                                    <div class="timeline-item">
+                                                        <div class="timeline-dot"
+                                                            style="border-color: {{ $dotColor }}"></div>
+                                                        <div class="timeline-content">
+                                                            <div class="timeline-header">
+                                                                <span
+                                                                    class="badge bg-{{ $badgeClass }}">{{ $history->status }}</span>
+                                                                <span class="timeline-date"><i
+                                                                        class="far fa-clock me-1"></i>{{ date('d-m-Y H:i', strtotime($history->created_at)) }}</span>
+                                                            </div>
+                                                            @if ($history->notes)
+                                                                <div class="timeline-note">{{ $history->notes }}</div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+
+                                                @if ($requestLetter->historyRequestLetters->isEmpty())
+                                                    <p class="text-center text-muted my-3">Belum ada riwayat status</p>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @else
-                        <div class="alert alert-danger">
-                            Data pengajuan tidak ditemukan
-                        </div>
-                    @endif
+                        @else
+                            <div class="alert alert-danger">
+                                Data pengajuan tidak ditemukan
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<style>
-.complaint-timeline {
-    position: relative;
-    padding-left: 30px;
-    margin-top: 10px;
-}
 
-.complaint-timeline::before {
-    content: '';
-    position: absolute;
-    left: 7px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #e9ecef;
-}
+    <style>
+        .complaint-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 10px;
+        }
 
-.timeline-item {
-    position: relative;
-    padding-bottom: 20px;
-}
+        .complaint-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
 
-.timeline-item:last-child {
-    padding-bottom: 0;
-}
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
 
-.timeline-dot {
-    position: absolute;
-    left: -30px;
-    top: 4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #fff;
-    border: 3px solid #0d6efd;
-    z-index: 1;
-}
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
 
-.timeline-content {
-    background: #f8f9fa;
-    padding: 12px 15px;
-    border-radius: 8px;
-    border: 1px solid #edf2f7;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #0d6efd;
+            z-index: 1;
+        }
 
-.timeline-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
 
-.timeline-date {
-    font-size: 0.75rem;
-    color: #718096;
-    font-weight: 500;
-}
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
 
-.timeline-note {
-    font-size: 0.875rem;
-    color: #4a5568;
-    line-height: 1.5;
-}
+        .timeline-date {
+            font-size: 0.75rem;
+            color: #718096;
+            font-weight: 500;
+        }
 
-.card {
-    border: none;
-    border-radius: 10px;
-}
+        .timeline-note {
+            font-size: 0.875rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
 
-.card-body {
-    padding: 1.5rem;
-}
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
 
-.shadow-sm {
-    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
-}
+        .card-body {
+            padding: 1.5rem;
+        }
 
-.bg-light {
-    background-color: #f8f9fa!important;
-}
+        .shadow-sm {
+            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+        }
 
-.rounded {
-    border-radius: 0.5rem!important;
-}
+        .bg-light {
+            background-color: #f8f9fa !important;
+        }
 
-.form-control:focus, .form-select:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
-}
+        .rounded {
+            border-radius: 0.5rem !important;
+        }
 
-.btn-primary {
-    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-    border: none;
-    padding: 0.5rem 1.5rem;
-}
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #357abd 0%, #2c6aa0 100%);
-}
-</style>
+        .btn-primary {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            border: none;
+            padding: 0.5rem 1.5rem;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #357abd 0%, #2c6aa0 100%);
+        }
+
+        .preview-modal-content {
+            overflow: hidden;
+        }
+
+        .protected-preview-wrapper {
+            position: relative;
+            min-height: 300px;
+            max-height: 75vh;
+            overflow: hidden;
+            background: #111;
+            border-radius: 8px;
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .protected-preview-wrapper::before {
+            content: attr(data-watermark);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 2;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 3rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.18);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .protected-preview-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            background: transparent;
+        }
+
+        .protected-image {
+            position: relative;
+            z-index: 1;
+            max-width: 100%;
+            max-height: 75vh;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+        }
+
+        .preview-pdf {
+            width: 100%;
+            height: 75vh;
+            border: none;
+            background: #fff;
+        }
+    </style>
 @endsection
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
+            const pdfExtensions = ['pdf'];
+
+            $('.btn-preview-document').on('click', function() {
+                const title = $(this).data('title');
+                const url = $(this).data('url');
+                const extension = String($(this).data('extension')).toLowerCase();
+
+                $('#documentPreviewModalLabel').text(title);
+
+                $('#previewImageWrapper').addClass('d-none');
+                $('#previewPdfWrapper').addClass('d-none');
+                $('#previewUnsupported').addClass('d-none');
+
+                $('#previewImage').attr('src', '');
+                $('#previewPdf').attr('src', '');
+
+                if (imageExtensions.includes(extension)) {
+                    $('#previewImage').attr('src', url);
+                    $('#previewImageWrapper').removeClass('d-none');
+                } else if (pdfExtensions.includes(extension)) {
+                    $('#previewPdf').attr('src', url + '#toolbar=0&navpanes=0&scrollbar=1');
+                    $('#previewPdfWrapper').removeClass('d-none');
+                } else {
+                    $('#previewUnsupported').removeClass('d-none');
+                }
+            });
+
+            $('#documentPreviewModal').on('hidden.bs.modal', function() {
+                $('#previewImage').attr('src', '');
+                $('#previewPdf').attr('src', '');
+            });
+
+            $(document).on('contextmenu', '.protected-preview-wrapper, .protected-image', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            $(document).on('dragstart', '.protected-image', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            $(document).on('keydown', function(e) {
+                if ($('#documentPreviewModal').hasClass('show')) {
+                    if (
+                        e.key === 'F12' ||
+                        (e.ctrlKey && e.key.toLowerCase() === 's') ||
+                        (e.ctrlKey && e.key.toLowerCase() === 'u') ||
+                        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i')
+                    ) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+@endpush
