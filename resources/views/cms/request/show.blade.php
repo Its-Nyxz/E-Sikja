@@ -105,22 +105,35 @@
                                 <div class="card shadow-sm mb-4">
                                     <div class="card-body">
                                         <h5 class="card-title border-bottom pb-2 mb-4">Riwayat Status</h5>
-                                        <div class="timeline">
+                                        <div class="complaint-timeline">
                                             @foreach($requestLetter->historyRequestLetters as $history)
-                                                <div class="timeline-item mb-4">
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <span class="badge bg-{{ $history->status == 'Diajukan' ? 'warning' : ($history->status == 'Diproses' ? 'info' : ($history->status == 'Selesai' ? 'success' : 'danger')) }} me-2">
-                                                            {{ $history->status }}
-                                                        </span>
-                                                        <small class="text-muted">{{ date('d-m-Y H:i', strtotime($history->created_at)) }}</small>
-                                                    </div>
-                                                    @if($history->notes)
-                                                        <div class="bg-light p-2 rounded">
-                                                            <small class="text-muted">{{ $history->notes }}</small>
+                                                @php
+                                                    $badgeClass = '';
+                                                    $dotColor = '';
+                                                    switch ($history->status) {
+                                                        case 'Diajukan': $badgeClass = 'warning text-dark'; $dotColor = '#ffc107'; break;
+                                                        case 'Diproses': $badgeClass = 'primary'; $dotColor = '#0d6efd'; break;
+                                                        case 'Ditolak':  $badgeClass = 'danger';  $dotColor = '#dc3545'; break;
+                                                        case 'Selesai':  $badgeClass = 'success'; $dotColor = '#198754'; break;
+                                                    }
+                                                @endphp
+                                                <div class="timeline-item">
+                                                    <div class="timeline-dot" style="border-color: {{ $dotColor }}"></div>
+                                                    <div class="timeline-content">
+                                                        <div class="timeline-header">
+                                                            <span class="badge bg-{{ $badgeClass }}">{{ $history->status }}</span>
+                                                            <span class="timeline-date"><i class="far fa-clock me-1"></i>{{ date('d-m-Y H:i', strtotime($history->created_at)) }}</span>
                                                         </div>
-                                                    @endif
+                                                        @if($history->notes)
+                                                            <div class="timeline-note">{{ $history->notes }}</div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             @endforeach
+                                            
+                                            @if($requestLetter->historyRequestLetters->isEmpty())
+                                                <p class="text-center text-muted my-3">Belum ada riwayat status</p>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -138,15 +151,16 @@
 </div>
 
 <style>
-.timeline {
+.complaint-timeline {
     position: relative;
-    padding-left: 20px;
+    padding-left: 30px;
+    margin-top: 10px;
 }
 
-.timeline::before {
+.complaint-timeline::before {
     content: '';
     position: absolute;
-    left: 0;
+    left: 7px;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -155,18 +169,50 @@
 
 .timeline-item {
     position: relative;
+    padding-bottom: 20px;
 }
 
-.timeline-item::before {
-    content: '';
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-dot {
     position: absolute;
-    left: -24px;
-    top: 0;
-    width: 10px;
-    height: 10px;
+    left: -30px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: #4a90e2;
-    border: 2px solid #fff;
+    background: #fff;
+    border: 3px solid #0d6efd;
+    z-index: 1;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.timeline-date {
+    font-size: 0.75rem;
+    color: #718096;
+    font-weight: 500;
+}
+
+.timeline-note {
+    font-size: 0.875rem;
+    color: #4a5568;
+    line-height: 1.5;
 }
 
 .card {

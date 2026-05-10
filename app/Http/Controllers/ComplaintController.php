@@ -123,11 +123,19 @@ class ComplaintController extends Controller
             $histories = json_decode($complaint->histories ?? '[]', true);
             
             // Add new history
+            $note = $request->status == 'Ditolak' 
+                ? "Pengaduan ditolak oleh petugas (" . Auth::user()->name . ")." 
+                : "Pengaduan telah diverifikasi oleh petugas (" . Auth::user()->name . ") dan sedang diteruskan ke Admin untuk diproses.";
+            
+            if ($request->notes) {
+                $note .= " Catatan: " . $request->notes;
+            }
+
             $histories[] = [
                 'user_id' => Auth::id(),
                 'status' => $request->status,
                 'date' => now()->format('Y-m-d H:i:s'),
-                'note' => "Pengaduan ($request->status == 'Ditolak' ?? 'diverifikasi')  oleh " . Auth::user()->name . ($request->notes ? ". Catatan: " . $request->notes : "")
+                'note' => $note
             ];
 
             // Update complaint
@@ -189,11 +197,19 @@ class ComplaintController extends Controller
             $histories = json_decode($complaint->histories ?? '[]', true);
             
             // Add new history
+            $note = $request->status == 'Ditolak' 
+                ? "Pengaduan ditolak oleh admin (" . Auth::user()->name . ")." 
+                : "Pengaduan telah selesai diproses oleh admin (" . Auth::user()->name . ").";
+            
+            if ($request->notes) {
+                $note .= " Catatan: " . $request->notes;
+            }
+
             $histories[] = [
                 'user_id' => Auth::id(),
                 'status' => $request->status,
                 'date' => now()->format('Y-m-d H:i:s'),
-                'note' => "Pengaduan diverifikasi oleh admin " . Auth::user()->name . ($request->notes ? ". Catatan: " . $request->notes : "")
+                'note' => $note
             ];
 
             // Update complaint
