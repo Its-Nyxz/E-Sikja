@@ -20,9 +20,7 @@ class MyComplaintController extends Controller
         if (Auth::user()->role != 'masyarakat') {
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
-        $this->pathUpload = 'uploads/complaints/';
-        $this->pathPublic = public_path($this->pathUpload);
-
+        $this->pathUpload = 'complaints';
     }
 
     /**
@@ -138,8 +136,8 @@ class MyComplaintController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = Str::random(32) . '.' . $image->getClientOriginalExtension();
-                $image->move($this->pathPublic, $imageName);
-                $complaint->image = $this->pathUpload . $imageName;
+                $image->storeAs($this->pathUpload, $imageName, 'private');
+                $complaint->image = $this->pathUpload . '/' . $imageName;
             }
 
 
@@ -200,7 +198,7 @@ class MyComplaintController extends Controller
             'location' => $complaint->location,
             'status' => $complaint->status,
             'description' => $complaint->description,
-            'image' => $complaint->image ? asset( $complaint->image) : null,
+            'image' => $complaint->image ? route('pengaduan.gambar', $complaint->id) : null,
             'histories' => $formattedHistories
         ]);
     }
@@ -253,16 +251,22 @@ class MyComplaintController extends Controller
 
              if ($request->hasFile('image')) {
                 if ($complaint->image) {
-                    $oldImagePath = public_path($information->image);
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
+                    // Delete old file from storage
+                    $oldStoragePath = storage_path('app/private/' . $complaint->image);
+                    if (file_exists($oldStoragePath)) {
+                        unlink($oldStoragePath);
+                    }
+                    // Also try public path for legacy files
+                    $oldPublicPath = public_path($complaint->image);
+                    if (file_exists($oldPublicPath)) {
+                        unlink($oldPublicPath);
                     }
                 }
                 
                 $image = $request->file('image');
                 $imageName = Str::random(32) . '.' . $image->getClientOriginalExtension();
-                $image->move($this->pathPublic, $imageName);
-                $complaint->image = $pathUpload . $imageName;
+                $image->storeAs($this->pathUpload, $imageName, 'private');
+                $complaint->image = $this->pathUpload . '/' . $imageName;
             }
 
             $histories = json_decode($complaint->histories, true);

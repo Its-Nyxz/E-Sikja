@@ -78,8 +78,12 @@
                                     <div class="card-body">
                                         <h5 class="card-title border-bottom pb-2 mb-4">Bukti Pengaduan</h5>
                                         @if($complaint->image)
-                                            <div class="text-center">
-                                                <img src="{{ asset( $complaint->image) }}" alt="Bukti Pengaduan" class="img-fluid rounded" style="max-height: 300px;">
+                                            <div class="text-center" oncontextmenu="return false;">
+                                                <div style="position:relative; display:inline-block;">
+                                                    <img src="{{ route('pengaduan.gambar', $complaint->id) }}" alt="Bukti Pengaduan" class="img-fluid rounded" style="max-height: 300px; user-select:none; -webkit-user-drag:none; pointer-events:none;">
+                                                    <div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;"></div>
+                                                </div>
+                                                <div class="mt-2"><small class="text-muted"><i class="fas fa-shield-alt me-1"></i>Gambar dilindungi</small></div>
                                             </div>
                                         @else
                                             <div class="alert alert-info">
