@@ -299,6 +299,7 @@ $(document).ready(function() {
             if (data.image) {
                 $('#current-image').show();
                 $('#current-image img').attr('src', data.image);
+                $('#current-image img').css({'user-select': 'none', '-webkit-user-drag': 'none', 'pointer-events': 'none'});
             } else {
                 $('#current-image').hide();
             }
@@ -390,11 +391,17 @@ $(document).ready(function() {
                 ' text-white">' + data.status + '</span>');
             $('#modal-description').text(data.description);
             
-            // Handle image
+            // Handle image (secured - no download)
             if (data.image) {
-                $('#modal-image').html('<img src="' + data.image + '" class="img-fluid" style="max-height: 300px;">');
+                $('#modal-image').html(
+                    '<div style="position:relative; display:inline-block;" oncontextmenu="return false;">' +
+                        '<img src="' + data.image + '" class="img-fluid rounded" style="max-height: 300px; user-select:none; -webkit-user-drag:none; pointer-events:none;">' +
+                        '<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;"></div>' +
+                    '</div>' +
+                    '<div class="mt-2"><small class="text-muted"><i class="fas fa-shield-alt me-1"></i>Gambar dilindungi</small></div>'
+                );
             } else {
-                $('#modal-image').text('Tidak ada foto');
+                $('#modal-image').html('<p class="text-muted">Tidak ada foto</p>');
             }
 
             // Handle history

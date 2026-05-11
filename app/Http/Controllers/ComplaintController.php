@@ -242,10 +242,14 @@ class ComplaintController extends Controller
         $complaint = Complaint::with(['user'])->findOrFail($id);
         $histories = json_decode($complaint->histories ?? '[]', true);
         
+        // Add secure image URL
+        $complaintData = $complaint->toArray();
+        $complaintData['secure_image_url'] = $complaint->image ? route('pengaduan.gambar', $complaint->id) : null;
+        
         return response()->json([
             'status' => 'success',
             'data' => [
-                'complaint' => $complaint,
+                'complaint' => $complaintData,
                 'histories' => $histories
             ]
         ]);
