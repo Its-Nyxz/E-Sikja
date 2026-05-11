@@ -330,41 +330,69 @@
             background: linear-gradient(135deg, #357abd 0%, #2c6aa0 100%);
         }
 
+        /* ===== MODAL PREVIEW DOKUMEN ===== */
+
+        #documentPreviewModal .modal-dialog {
+            max-width: 95vw;
+        }
+
+        #documentPreviewModal .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #documentPreviewModal .modal-header {
+            padding: 14px 18px;
+        }
+
+        #documentPreviewModal .modal-body {
+            background: #f1f3f5;
+            padding: 16px;
+        }
+
+        #documentPreviewModal .modal-footer {
+            padding: 12px 18px;
+        }
+
         .preview-modal-content {
             overflow: hidden;
         }
 
         .protected-preview-wrapper {
             position: relative;
-            min-height: 300px;
+            width: 100%;
             max-height: 75vh;
-            overflow: hidden;
-            background: #111;
-            border-radius: 8px;
+            overflow: auto;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 12px;
             text-align: center;
             user-select: none;
             -webkit-user-select: none;
         }
 
+        /* Watermark */
         .protected-preview-wrapper::before {
             content: attr(data-watermark);
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
-            z-index: 2;
+            z-index: 5;
             transform: translate(-50%, -50%) rotate(-25deg);
-            font-size: 3rem;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.18);
+            font-size: clamp(2rem, 5vw, 5rem);
+            font-weight: 800;
+            color: rgba(0, 0, 0, 0.12);
             white-space: nowrap;
             pointer-events: none;
         }
 
+        /* Layer transparan di atas gambar */
         .protected-preview-wrapper::after {
             content: '';
             position: absolute;
             inset: 0;
-            z-index: 3;
+            z-index: 4;
             pointer-events: none;
             background: transparent;
         }
@@ -372,9 +400,14 @@
         .protected-image {
             position: relative;
             z-index: 1;
+            display: block;
+            width: 100%;
+            height: auto;
             max-width: 100%;
-            max-height: 75vh;
-            object-fit: contain;
+            margin: 0 auto;
+            border-radius: 6px;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
             user-select: none;
             -webkit-user-select: none;
             -webkit-user-drag: none;
@@ -384,7 +417,8 @@
         .preview-pdf {
             width: 100%;
             height: 75vh;
-            border: none;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
             background: #fff;
         }
     </style>
