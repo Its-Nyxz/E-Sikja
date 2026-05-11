@@ -16,6 +16,7 @@ use App\Http\Controllers\InformationController;
 use App\Http\Controllers\MyComplaintController;
 use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DocumentController;
 
 Route::fallback(function () {
     if (Auth::user()) {
@@ -77,6 +78,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('dashboard/chart-data', [DashboardController::class, 'chartData'])->name('dashboard.chart-data');
     Route::get('pengaduan-saya/check', [DashboardController::class, 'checkComplaintStatus'])->name('pengaduan-saya.check');
+
+    // Secure document serving routes (view-only, no download)
+    Route::get('dokumen/{id}/lihat', [DocumentController::class, 'showDocument'])->name('dokumen.lihat');
+    Route::get('pengaduan/{id}/gambar', [DocumentController::class, 'showComplaintImage'])->name('pengaduan.gambar');
     Route::prefix('data-masyarakat')->group(function () {
         Route::get('/', [ResidentController::class, 'index'])->name('data-masyarakat.index');
         Route::get('/show/{id}', [ResidentController::class, 'show'])->name('data-masyarakat.show');
