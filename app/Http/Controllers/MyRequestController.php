@@ -131,26 +131,24 @@ class MyRequestController extends Controller
                 'data' => json_encode($data)
             ]);
 
-            // Handle document uploads
+            // Handle document uploads (stored in storage/app/private/ for security)
             if ($request->hasFile('documents')) {
                 $documents = $request->file('documents');
                 $requiredDocuments = json_decode($requestType->required_documents);
-                $this->pathUpload = "$this->pathUpload/$requestType->code/";
-                $this->pathPublic = public_path($this->pathUpload) ?? $this->pathUpload;
+                $storagePath = "documents/{$requestType->code}";
                 foreach ($documents as $index => $document) {
                     if ($document->isValid()) {
                         $documentName = Str::random(32) . '.' . $document->getClientOriginalExtension();
-                        $document->move($this->pathPublic, $documentName);
+                        $document->storeAs($storagePath, $documentName, 'private');
                         
                         DocumentRequestLetter::create([
                             'request_letter_id' => $requestLetter->id,
                             'name' => $requiredDocuments[$index] ?? 'Document ' . ($index + 1),
-                            'url' => $this->pathUpload . $documentName,
+                            'url' => $storagePath . '/' . $documentName,
                             'type' => $document->getClientOriginalExtension(),
                             'description' => "Dokumen $requiredDocuments[$index] untuk permohonan $requestType->name"
                         ]);
                     }
-
                 }
             }
 
@@ -241,30 +239,36 @@ class MyRequestController extends Controller
                 'data' => json_encode($data)
             ]);
 
-            // Handle document uploads
+            // Handle document uploads (stored in storage/app/private/ for security)
             if ($request->hasFile('documents')) {
                 $documents = $request->file('documents');
                 $requiredDocuments = json_decode($requestType->required_documents);
-                $this->pathUpload = "$this->pathUpload/$requestType->code/";
-                $this->pathPublic = public_path($this->pathUpload) ?? $this->pathUpload;
+                $storagePath = "documents/{$requestType->code}";
                 
                 foreach ($documents as $index => $document) {
                     if ($document->isValid()) {
                         $documentName = Str::random(32) . '.' . $document->getClientOriginalExtension();
-                        $document->move($this->pathPublic, $documentName);
+                        $document->storeAs($storagePath, $documentName, 'private');
                         
                         // Delete old document if exists
                         $oldDocument = $requestLetter->documentRequestLetters->where('name', $requiredDocuments[$index] ?? 'Document ' . ($index + 1))->first();
                         if ($oldDocument) {
-                            if (file_exists(asset($oldDocument->url))) {
-                                unlink(asset($oldDocument->url));
+                            // Delete old file from storage
+                            $oldStoragePath = storage_path('app/private/' . $oldDocument->url);
+                            if (file_exists($oldStoragePath)) {
+                                unlink($oldStoragePath);
                             }
-                            $oldDocument->update(['url' => $this->pathUpload . $documentName]);
-                        }else{
+                            // Also try public path for legacy files
+                            $oldPublicPath = public_path($oldDocument->url);
+                            if (file_exists($oldPublicPath)) {
+                                unlink($oldPublicPath);
+                            }
+                            $oldDocument->update(['url' => $storagePath . '/' . $documentName]);
+                        } else {
                             DocumentRequestLetter::create([
                                 'request_letter_id' => $requestLetter->id,
                                 'name' => $requiredDocuments[$index] ?? 'Document ' . ($index + 1),
-                                'url' => $this->pathUpload . $documentName,
+                                'url' => $storagePath . '/' . $documentName,
                                 'type' => $document->getClientOriginalExtension(),
                                 'description' => "Dokumen $requiredDocuments[$index] untuk permohonan $requestType->name"
                             ]);

@@ -415,9 +415,15 @@ $(document).ready(function () {
                 $('#modal-description').text(data.description);
                 $('#modal-location').text(data.location);
                 
-                // Handle image
-                if (data.image) {
-                    $('#modal-image').html('<img src="' + data.image + '" class="img-fluid rounded" style="max-height: 200px;">');
+                // Handle image (secured - no download)
+                if (data.secure_image_url) {
+                    $('#modal-image').html(
+                        '<div style="position:relative; display:inline-block;" oncontextmenu="return false;">' +
+                            '<img src="' + data.secure_image_url + '" class="img-fluid rounded" style="max-height: 200px; user-select:none; -webkit-user-drag:none; pointer-events:none;">' +
+                            '<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;"></div>' +
+                        '</div>' +
+                        '<div class="mt-2"><small class="text-muted"><i class="fas fa-shield-alt me-1"></i>Gambar dilindungi</small></div>'
+                    );
                 } else {
                     $('#modal-image').html('<p class="text-muted">Tidak ada foto</p>');
                 }
