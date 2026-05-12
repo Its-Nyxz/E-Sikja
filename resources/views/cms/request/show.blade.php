@@ -160,6 +160,9 @@
                                                         Tutup
                                                     </button>
                                                 </div>
+                                                <button type="button" class="btn btn-sm btn-info" onclick="openDocumentViewer('{{ route('dokumen.lihat', $document->id) }}', '{{ $document->name }}')">
+                                                    <i class="fas fa-eye"></i> Lihat
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -226,262 +229,109 @@
             </div>
         </div>
     </div>
+</div>
 
+<style>
+.complaint-timeline {
+    position: relative;
+    padding-left: 30px;
+    margin-top: 10px;
+}
 
-    <style>
-        .complaint-timeline {
-            position: relative;
-            padding-left: 30px;
-            margin-top: 10px;
-        }
+.complaint-timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
 
-        .complaint-timeline::before {
-            content: '';
-            position: absolute;
-            left: 7px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #e9ecef;
-        }
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+}
 
-        .timeline-item {
-            position: relative;
-            padding-bottom: 20px;
-        }
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
 
-        .timeline-item:last-child {
-            padding-bottom: 0;
-        }
+.timeline-dot {
+    position: absolute;
+    left: -30px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #0d6efd;
+    z-index: 1;
+}
 
-        .timeline-dot {
-            position: absolute;
-            left: -30px;
-            top: 4px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #fff;
-            border: 3px solid #0d6efd;
-            z-index: 1;
-        }
+.timeline-content {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
 
-        .timeline-content {
-            background: #f8f9fa;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #edf2f7;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-        }
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
 
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+.timeline-date {
+    font-size: 0.75rem;
+    color: #718096;
+    font-weight: 500;
+}
 
-        .timeline-date {
-            font-size: 0.75rem;
-            color: #718096;
-            font-weight: 500;
-        }
+.timeline-note {
+    font-size: 0.875rem;
+    color: #4a5568;
+    line-height: 1.5;
+}
 
-        .timeline-note {
-            font-size: 0.875rem;
-            color: #4a5568;
-            line-height: 1.5;
-        }
+.card {
+    border: none;
+    border-radius: 10px;
+}
 
-        .card {
-            border: none;
-            border-radius: 10px;
-        }
+.card-body {
+    padding: 1.5rem;
+}
 
-        .card-body {
-            padding: 1.5rem;
-        }
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+}
 
-        .shadow-sm {
-            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
-        }
+.bg-light {
+    background-color: #f8f9fa!important;
+}
 
-        .bg-light {
-            background-color: #f8f9fa !important;
-        }
+.rounded {
+    border-radius: 0.5rem!important;
+}
 
-        .rounded {
-            border-radius: 0.5rem !important;
-        }
+.form-control:focus, .form-select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
 
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
-        }
+.btn-primary {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    border: none;
+    padding: 0.5rem 1.5rem;
+}
 
-        .btn-primary {
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            border: none;
-            padding: 0.5rem 1.5rem;
-        }
+.btn-primary:hover {
+    background: linear-gradient(135deg, #357abd 0%, #2c6aa0 100%);
+}
+</style>
 
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #357abd 0%, #2c6aa0 100%);
-        }
-
-        /* ===== MODAL PREVIEW DOKUMEN ===== */
-
-        #documentPreviewModal .modal-dialog {
-            max-width: 95vw;
-        }
-
-        #documentPreviewModal .modal-content {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        #documentPreviewModal .modal-header {
-            padding: 14px 18px;
-        }
-
-        #documentPreviewModal .modal-body {
-            background: #f1f3f5;
-            padding: 16px;
-        }
-
-        #documentPreviewModal .modal-footer {
-            padding: 12px 18px;
-        }
-
-        .preview-modal-content {
-            overflow: hidden;
-        }
-
-        .protected-preview-wrapper {
-            position: relative;
-            width: 100%;
-            max-height: 75vh;
-            overflow: auto;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        /* Watermark */
-        .protected-preview-wrapper::before {
-            content: attr(data-watermark);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            z-index: 5;
-            transform: translate(-50%, -50%) rotate(-25deg);
-            font-size: clamp(2rem, 5vw, 5rem);
-            font-weight: 800;
-            color: rgba(0, 0, 0, 0.12);
-            white-space: nowrap;
-            pointer-events: none;
-        }
-
-        /* Layer transparan di atas gambar */
-        .protected-preview-wrapper::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            z-index: 4;
-            pointer-events: none;
-            background: transparent;
-        }
-
-        .protected-image {
-            position: relative;
-            z-index: 1;
-            display: block;
-            width: 100%;
-            height: auto;
-            max-width: 100%;
-            margin: 0 auto;
-            border-radius: 6px;
-            background: #fff;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-user-drag: none;
-            pointer-events: none;
-        }
-
-        .preview-pdf {
-            width: 100%;
-            height: 75vh;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            background: #fff;
-        }
-    </style>
+@include('components.document-viewer')
 @endsection
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
-            const pdfExtensions = ['pdf'];
-
-            $('.btn-preview-document').on('click', function() {
-                const title = $(this).data('title');
-                const url = $(this).data('url');
-                const extension = String($(this).data('extension')).toLowerCase();
-
-                $('#documentPreviewModalLabel').text(title);
-
-                $('#previewImageWrapper').addClass('d-none');
-                $('#previewPdfWrapper').addClass('d-none');
-                $('#previewUnsupported').addClass('d-none');
-
-                $('#previewImage').attr('src', '');
-                $('#previewPdf').attr('src', '');
-
-                if (imageExtensions.includes(extension)) {
-                    $('#previewImage').attr('src', url);
-                    $('#previewImageWrapper').removeClass('d-none');
-                } else if (pdfExtensions.includes(extension)) {
-                    $('#previewPdf').attr('src', url + '#toolbar=0&navpanes=0&scrollbar=1');
-                    $('#previewPdfWrapper').removeClass('d-none');
-                } else {
-                    $('#previewUnsupported').removeClass('d-none');
-                }
-            });
-
-            $('#documentPreviewModal').on('hidden.bs.modal', function() {
-                $('#previewImage').attr('src', '');
-                $('#previewPdf').attr('src', '');
-            });
-
-            $(document).on('contextmenu', '.protected-preview-wrapper, .protected-image', function(e) {
-                e.preventDefault();
-                return false;
-            });
-
-            $(document).on('dragstart', '.protected-image', function(e) {
-                e.preventDefault();
-                return false;
-            });
-
-            $(document).on('keydown', function(e) {
-                if ($('#documentPreviewModal').hasClass('show')) {
-                    if (
-                        e.key === 'F12' ||
-                        (e.ctrlKey && e.key.toLowerCase() === 's') ||
-                        (e.ctrlKey && e.key.toLowerCase() === 'u') ||
-                        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i')
-                    ) {
-                        e.preventDefault();
-                        return false;
-                    }
-                }
-            });
-        });
-    </script>
-@endpush

@@ -112,9 +112,9 @@
                                                     <span class="badge bg-primary me-2">{{ $index + 1 }}</span>
                                                     <span class="fw-medium">{{ $document->name }}</span>
                                                 </div>
-                                                <a href="{{ asset( $document->url) }}" target="_blank" class="btn btn-sm btn-info">
+                                                <button type="button" class="btn btn-sm btn-info" onclick="openDocumentViewer('{{ route('dokumen.lihat', $document->id) }}', '{{ $document->name }}')">
                                                     <i class="fas fa-eye"></i> Lihat
-                                                </a>
+                                                </button>
                                             </div>
                                         @endforeach
                                     </div>
@@ -208,4 +208,6 @@
     border-radius: 0.5rem!important;
 }
 </style>
+
+@include('components.document-viewer')
 @endsection 
