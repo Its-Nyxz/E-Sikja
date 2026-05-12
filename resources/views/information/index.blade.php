@@ -176,6 +176,7 @@
                 // Delete button handler
                 $(document).on('click', '.delete-btn', function() {
                     let id = $(this).data('id');
+
                     Swal.fire({
                         title: 'Apakah Anda yakin?',
                         text: "Data yang dihapus tidak dapat dikembalikan!",
@@ -189,9 +190,10 @@
                         if (result.isConfirmed) {
                             $.ajax({
                                 url: `/informasi-kelurahan/delete/${id}`,
-                                type: 'DELETE',
+                                type: 'POST',
                                 data: {
-                                    _token: '{{ csrf_token() }}'
+                                    _token: '{{ csrf_token() }}',
+                                    _method: 'DELETE'
                                 },
                                 success: function(response) {
                                     table.ajax.reload(null, false);
@@ -202,6 +204,9 @@
                                     });
                                 },
                                 error: function(xhr) {
+                                    console.log('Status:', xhr.status);
+                                    console.log('Response:', xhr.responseText);
+
                                     Toast.fire({
                                         icon: 'error',
                                         title: 'Data gagal dihapus'
