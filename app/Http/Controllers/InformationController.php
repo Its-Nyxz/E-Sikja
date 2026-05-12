@@ -42,12 +42,12 @@ class InformationController extends Controller
                     ';
                 })
                 ->addColumn('status_badge', function ($information) {
-                    return $information->status 
+                    return $information->status
                         ? '<span class="badge badge-success">Aktif</span>'
                         : '<span class="badge badge-danger">Nonaktif</span>';
                 })
                 ->addColumn('image_preview', function ($information) {
-                    return $information->image 
+                    return $information->image
                         ? '<img src="' . asset($information->image) . '" class="img-thumbnail" width="50">'
                         : '<span class="text-muted">No Image</span>';
                 })
@@ -138,7 +138,7 @@ class InformationController extends Controller
                     unlink($oldImagePath);
                 }
             }
-            
+
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move($this->pathUpload, $imageName);
@@ -153,26 +153,52 @@ class InformationController extends Controller
 
     public function destroy($id)
     {
-        $information = Information::findOrFail($id);
-        
-        if ($information->image) {
-            $imagePath = public_path($information->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-        }
-        
-        $information->delete();
+        try {
+            $information = Information::findOrFail($id);
 
-        return response()->json(['success' => true]);
+            // Hapus gambar jika ada
+            if (!empty($information->image)) {
+                $imagePath = public_path($information->image);
+
+                if (file_exists($imagePath) && is_file($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+
+            // Hapus data dari database
+            $information->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data gagal dihapus',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    public function toggleStatus($id)
+    public function toggleStatus(Request $request, $id)
     {
-        $information = Information::findOrFail($id);
-        $information->status = !$information->status;
-        $information->save();
-        
-        return response()->json(['success' => true]);
+        try {
+            $information = Information::findOrFail($id);
+
+            $information->status = $request->status;
+            $information->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diubah'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status gagal diubah',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
