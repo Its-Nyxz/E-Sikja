@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\RequestType;
+use Illuminate\Support\Str;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\RequestLetter;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Models\HistoryRequestLetter;
-use App\Models\DocumentRequestLetter;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Str;
+use App\Models\DocumentRequestLetter;
+use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 
 class MyRequestController extends Controller
@@ -28,18 +29,18 @@ class MyRequestController extends Controller
 
         $this->pathUpload = 'uploads/documents/';
         // $this->pathPublic = public_path($this->pathUpload);
-        
+
     }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-         if ($request->ajax()) {
+        if ($request->ajax()) {
             $status = $request->status;
             // Capitalize status from JS tab ID to match DB enum values
             $statusFilter = $status && $status != 'semua' ? ucfirst($status) : null;
-            
+
             $query = RequestLetter::with(['requestType'])->where('user_id', auth()->id());
             if ($statusFilter) {
                 $query = $query->where('status', $statusFilter);
@@ -57,23 +58,23 @@ class MyRequestController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('request_type', function($row) {
+                ->addColumn('request_type', function ($row) {
                     return $row->requestType->name;
                 })
-                ->addColumn('created_at', function($row) {
+                ->addColumn('created_at', function ($row) {
                     return date('d-m-Y', strtotime($row->created_at));
                 })
-                ->addColumn('action', function($row) {
+                ->addColumn('action', function ($row) {
                     $actionBtn = '<div class="btn-group" role="group" aria-label="Basic example">';
-                    $actionBtn .= '<a href="'.route('pengajuan-saya.show', $row->id).'" class="btn btn-info btn-sm"><span class="fa fa-eye"></span></a>';
+                    $actionBtn .= '<a href="' . route('pengajuan-saya.show', $row->id) . '" class="btn btn-info btn-sm"><span class="fa fa-eye"></span></a>';
                     if ($row->status == 'Diajukan') {
-                        $actionBtn .= '<a href="'.route('pengajuan-saya.edit', $row->id).'" class="btn btn-warning btn-sm"><span class="fa fa-edit"></span></a>';
-                        $actionBtn .= '<form action="'.route('pengajuan-saya.destroy', $row->id).'" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus permohonan ini?\');">
-                                        '.csrf_field().method_field('DELETE').'
+                        $actionBtn .= '<a href="' . route('pengajuan-saya.edit', $row->id) . '" class="btn btn-warning btn-sm"><span class="fa fa-edit"></span></a>';
+                        $actionBtn .= '<form action="' . route('pengajuan-saya.destroy', $row->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus permohonan ini?\');">
+                                        ' . csrf_field() . method_field('DELETE') . '
                                         <button type="submit" class="btn btn-danger btn-sm"><span class="fa fa-trash"></span></button>
                                        </form>';
-                    }else if ($row->status == 'Selesai') {
-                        $actionBtn .= '<a href="'.route('pengajuan-saya.print', $row->id).'" class="btn btn-success btn-sm"><span class="fa fa-print"></span></a>';
+                    } else if ($row->status == 'Selesai') {
+                        $actionBtn .= '<a href="' . route('pengajuan-saya.print', $row->id) . '" class="btn btn-success btn-sm"><span class="fa fa-print"></span></a>';
                     }
                     $actionBtn .= '</div>';
                     return $actionBtn;
@@ -116,16 +117,16 @@ class MyRequestController extends Controller
             unset($data['documents']);
             unset($data['_token']);
             // dd($data);
-           
+
 
             $baseCode = $requestType->code;
             $requestLetterLast = RequestLetter::where('code', 'like', "$baseCode-%")->orderBy('id', 'desc')->first();
             $lastNumber = $requestLetterLast ? intval(substr($requestLetterLast->code, -4)) + 1 : 1;
             $code = $baseCode . '-' . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
-            
+
             // Create request letter
             $requestLetter = RequestLetter::create([
-                'request_type_id' => $requestType->id, 
+                'request_type_id' => $requestType->id,
                 'user_id' => auth()->user()->id,
                 'code' => $code,
                 'data' => json_encode($data)
@@ -140,7 +141,7 @@ class MyRequestController extends Controller
                     if ($document->isValid()) {
                         $documentName = Str::random(32) . '.' . $document->getClientOriginalExtension();
                         $document->storeAs($storagePath, $documentName, 'private');
-                        
+
                         DocumentRequestLetter::create([
                             'request_letter_id' => $requestLetter->id,
                             'name' => $requiredDocuments[$index] ?? 'Document ' . ($index + 1),
@@ -161,11 +162,11 @@ class MyRequestController extends Controller
             // Send notification
             $operator = User::where('role', 'operator')->get();
             foreach ($operator as $user) {
-                Notification::create([ 
+                Notification::create([
                     'type' => 'Pengajuan',
                     'user_id' => $user->id,
-                    'title' => 'Pengajuan Baru '.$requestLetter->requestType->name,
-                    'text' => 'Pengajuan baru telah dibuat oleh ' . auth()->user()->name. ' dengan nomor pengajuan ' . $requestLetter->code,
+                    'title' => 'Pengajuan Baru ' . $requestLetter->requestType->name,
+                    'text' => 'Pengajuan baru telah dibuat oleh ' . auth()->user()->name . ' dengan nomor pengajuan ' . $requestLetter->code,
                     'link' => '/data-pengajuan/verifikasi-operator/' . $requestLetter->id
                 ]);
             }
@@ -208,7 +209,8 @@ class MyRequestController extends Controller
         $data = [
             'title' => 'Edit Pengajuan',
             'requestLetter' =>  $requestLetter,
-            'requestTypes' => RequestType::where('status', true)->get()
+            'requestTypes' => RequestType::where('status', true)->get(),
+            'documents' => $requestLetter->documentRequestLetters,
         ];
 
         return view('cms.my-request.edit')->with($data);
@@ -228,7 +230,7 @@ class MyRequestController extends Controller
             $data = $request->all();
             $requestLetter = RequestLetter::findOrFail($id);
             $requestType = RequestType::find($request->request_type_id);
-            
+
             unset($data['documents']);
             unset($data['_token']);
             unset($data['_method']);
@@ -244,12 +246,12 @@ class MyRequestController extends Controller
                 $documents = $request->file('documents');
                 $requiredDocuments = json_decode($requestType->required_documents);
                 $storagePath = "documents/{$requestType->code}";
-                
+
                 foreach ($documents as $index => $document) {
                     if ($document->isValid()) {
                         $documentName = Str::random(32) . '.' . $document->getClientOriginalExtension();
                         $document->storeAs($storagePath, $documentName, 'private');
-                        
+
                         // Delete old document if exists
                         $oldDocument = $requestLetter->documentRequestLetters->where('name', $requiredDocuments[$index] ?? 'Document ' . ($index + 1))->first();
                         if ($oldDocument) {
@@ -276,16 +278,16 @@ class MyRequestController extends Controller
                     }
                 }
             }
-                
+
 
             // Send notification
             $operator = User::where('role', 'operator')->get();
             foreach ($operator as $user) {
-                Notification::create([ 
+                Notification::create([
                     'type' => 'Pengajuan',
                     'user_id' => $user->id,
-                    'title' => 'Pengajuan Diperbarui '.$requestLetter->requestType->name,
-                    'text' => 'Pengajuan telah diperbarui oleh ' . auth()->user()->name. ' dengan nomor pengajuan ' . $requestLetter->code,
+                    'title' => 'Pengajuan Diperbarui ' . $requestLetter->requestType->name,
+                    'text' => 'Pengajuan telah diperbarui oleh ' . auth()->user()->name . ' dengan nomor pengajuan ' . $requestLetter->code,
                     'link' => '/data-pengajuan/verifikasi-operator/' . $requestLetter->id
                 ]);
             }
@@ -325,7 +327,7 @@ class MyRequestController extends Controller
 
         $request->session()->flashInput($request->all());
         $requestType = RequestType::where('code', $code)->firstOrFail();
-        
+
         $resident = auth()->user()->resident;
 
 
@@ -341,7 +343,7 @@ class MyRequestController extends Controller
             $data['requestLetter']->code = $requestLetter->code;
             // dd($data['requestLetter']);
             $data['documents'] = $requestLetter->documentRequestLetters;
-            
+
             // dd($data['requestLetter']);
         }
 
@@ -349,7 +351,7 @@ class MyRequestController extends Controller
 
         // dd($requestLetter);
         // dd($data['requestLetter']);
-        return view('cms.my-request.form.'.strtolower($code))->with($data);
+        return view('cms.my-request.form.' . strtolower($code))->with($data);
     }
 
     /**
@@ -370,7 +372,7 @@ class MyRequestController extends Controller
             'data' => json_decode($requestLetter->data)
         ];
 
-        $pdf = PDF::loadView('cms.my-request.print.'.strtolower($data['requestType']->code), $data)
+        $pdf = PDF::loadView('cms.my-request.print.' . strtolower($data['requestType']->code), $data)
             ->setPaper('a4');
         $filename = 'pengajuan-' . str_replace(['/', '\\'], '-', $requestLetter->code) . '.pdf';
         return $pdf->stream($filename);
@@ -386,7 +388,7 @@ class MyRequestController extends Controller
     {
         try {
             $nomor_pengajuan = $request->query('nomor_pengajuan');
-            
+
             if (!$nomor_pengajuan) {
                 return response()->json([
                     'success' => false,
@@ -455,12 +457,64 @@ class MyRequestController extends Controller
                     'created_at' => $pengajuan->created_at->format('d/m/Y H:i')
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memeriksa status pengajuan'
             ], 500);
         }
+    }
+
+    public function previewDocument($id)
+    {
+        $document = DocumentRequestLetter::with('requestLetter')->findOrFail($id);
+
+        if (!$document->requestLetter || $document->requestLetter->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $path = ltrim($document->url, '/');
+
+        /*
+     * File baru: storage/app/private/...
+     */
+        if (Storage::disk('private')->exists($path)) {
+            $mimeType = Storage::disk('private')->mimeType($path) ?? 'image/jpeg';
+
+            return response(Storage::disk('private')->get($path), 200, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            ]);
+        }
+
+        /*
+     * File lama: public/uploads/...
+     */
+        $publicPath = public_path($path);
+
+        if (file_exists($publicPath)) {
+            return response()->file($publicPath, [
+                'Content-Disposition' => 'inline; filename="' . basename($publicPath) . '"',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            ]);
+        }
+
+        /*
+     * File lama: storage/app/public/...
+     */
+        $storagePublicPath = str_replace('storage/', '', $path);
+
+        if (Storage::disk('public')->exists($storagePublicPath)) {
+            $mimeType = Storage::disk('public')->mimeType($storagePublicPath) ?? 'image/jpeg';
+
+            return response(Storage::disk('public')->get($storagePublicPath), 200, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . basename($storagePublicPath) . '"',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            ]);
+        }
+
+        abort(404, 'File dokumen tidak ditemukan.');
     }
 }

@@ -111,227 +111,182 @@
                                                         <span class="fw-medium">{{ $document->name }}</span>
                                                     </div>
 
-                                                    <button type="button" class="btn btn-sm btn-info btn-preview-document"
-                                                        data-bs-toggle="modal" data-bs-target="#documentPreviewModal"
-                                                        data-title="{{ $document->name }}" data-url="{{ $fileUrl }}"
-                                                        data-extension="{{ $extension }}">
+                                                    <button type="button" class="btn btn-sm btn-info"
+                                                        onclick="openDocumentViewer('{{ $fileUrl }}', '{{ $document->name }}')">
                                                         <i class="fas fa-eye"></i> Lihat
                                                     </button>
                                                 </div>
                                             @endforeach
                                         </div>
                                     </div>
-                                    <div class="modal fade" id="documentPreviewModal" tabindex="-1"
-                                        aria-labelledby="documentPreviewModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-xl modal-dialog-centered">
-                                            <div class="modal-content preview-modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="documentPreviewModalLabel">Preview Dokumen
-                                                    </h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Tutup"></button>
-                                                </div>
+                                </div>
 
-                                                <div class="modal-body">
-                                                    <div id="previewImageWrapper" class="protected-preview-wrapper d-none"
-                                                        data-watermark="{{ $requestLetter->code ?? 'DOKUMEN' }}"
-                                                        oncontextmenu="return false;">
-
-                                                        <img id="previewImage" src="" alt="Preview Dokumen"
-                                                            class="protected-image" draggable="false">
+                                <div class="card shadow-sm mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title border-bottom pb-2 mb-4">Riwayat Status</h5>
+                                        <div class="complaint-timeline">
+                                            @foreach ($requestLetter->historyRequestLetters as $history)
+                                                @php
+                                                    $badgeClass = '';
+                                                    $dotColor = '';
+                                                    switch ($history->status) {
+                                                        case 'Diajukan':
+                                                            $badgeClass = 'warning text-dark';
+                                                            $dotColor = '#ffc107';
+                                                            break;
+                                                        case 'Diproses':
+                                                            $badgeClass = 'primary';
+                                                            $dotColor = '#0d6efd';
+                                                            break;
+                                                        case 'Ditolak':
+                                                            $badgeClass = 'danger';
+                                                            $dotColor = '#dc3545';
+                                                            break;
+                                                        case 'Selesai':
+                                                            $badgeClass = 'success';
+                                                            $dotColor = '#198754';
+                                                            break;
+                                                    }
+                                                @endphp
+                                                <div class="timeline-item">
+                                                    <div class="timeline-dot" style="border-color: {{ $dotColor }}">
                                                     </div>
-
-                                                    <div id="previewPdfWrapper" class="d-none">
-                                                        <iframe id="previewPdf" src="" class="preview-pdf"></iframe>
-                                                    </div>
-
-                                                    <div id="previewUnsupported" class="alert alert-warning d-none mb-0">
-                                                        File ini tidak dapat dipreview langsung. Format file tidak didukung
-                                                        untuk preview.
-                                                    </div>
-                                                </div>
-
-                                                <div class="modal-footer">
-                                                    <small class="text-muted me-auto">
-                                                        Dokumen hanya untuk preview.
-                                                    </small>
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">
-                                                        Tutup
-                                                    </button>
-                                                </div>
-                                                <button type="button" class="btn btn-sm btn-info" onclick="openDocumentViewer('{{ route('dokumen.lihat', $document->id) }}', '{{ $document->name }}')">
-                                                    <i class="fas fa-eye"></i> Lihat
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="card shadow-sm mb-4">
-                                        <div class="card-body">
-                                            <h5 class="card-title border-bottom pb-2 mb-4">Riwayat Status</h5>
-                                            <div class="complaint-timeline">
-                                                @foreach ($requestLetter->historyRequestLetters as $history)
-                                                    @php
-                                                        $badgeClass = '';
-                                                        $dotColor = '';
-                                                        switch ($history->status) {
-                                                            case 'Diajukan':
-                                                                $badgeClass = 'warning text-dark';
-                                                                $dotColor = '#ffc107';
-                                                                break;
-                                                            case 'Diproses':
-                                                                $badgeClass = 'primary';
-                                                                $dotColor = '#0d6efd';
-                                                                break;
-                                                            case 'Ditolak':
-                                                                $badgeClass = 'danger';
-                                                                $dotColor = '#dc3545';
-                                                                break;
-                                                            case 'Selesai':
-                                                                $badgeClass = 'success';
-                                                                $dotColor = '#198754';
-                                                                break;
-                                                        }
-                                                    @endphp
-                                                    <div class="timeline-item">
-                                                        <div class="timeline-dot"
-                                                            style="border-color: {{ $dotColor }}"></div>
-                                                        <div class="timeline-content">
-                                                            <div class="timeline-header">
-                                                                <span
-                                                                    class="badge bg-{{ $badgeClass }}">{{ $history->status }}</span>
-                                                                <span class="timeline-date"><i
-                                                                        class="far fa-clock me-1"></i>{{ date('d-m-Y H:i', strtotime($history->created_at)) }}</span>
-                                                            </div>
-                                                            @if ($history->notes)
-                                                                <div class="timeline-note">{{ $history->notes }}</div>
-                                                            @endif
+                                                    <div class="timeline-content">
+                                                        <div class="timeline-header">
+                                                            <span
+                                                                class="badge bg-{{ $badgeClass }}">{{ $history->status }}</span>
+                                                            <span class="timeline-date"><i
+                                                                    class="far fa-clock me-1"></i>{{ date('d-m-Y H:i', strtotime($history->created_at)) }}</span>
                                                         </div>
+                                                        @if ($history->notes)
+                                                            <div class="timeline-note">{{ $history->notes }}</div>
+                                                        @endif
                                                     </div>
-                                                @endforeach
+                                                </div>
+                                            @endforeach
 
-                                                @if ($requestLetter->historyRequestLetters->isEmpty())
-                                                    <p class="text-center text-muted my-3">Belum ada riwayat status</p>
-                                                @endif
-                                            </div>
+                                            @if ($requestLetter->historyRequestLetters->isEmpty())
+                                                <p class="text-center text-muted my-3">Belum ada riwayat status</p>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @else
-                            <div class="alert alert-danger">
-                                Data pengajuan tidak ditemukan
-                            </div>
-                        @endif
                     </div>
+                @else
+                    <div class="alert alert-danger">
+                        Data pengajuan tidak ditemukan
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-</div>
+    </div>
+    </div>
 
-<style>
-.complaint-timeline {
-    position: relative;
-    padding-left: 30px;
-    margin-top: 10px;
-}
+    <style>
+        .complaint-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 10px;
+        }
 
-.complaint-timeline::before {
-    content: '';
-    position: absolute;
-    left: 7px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #e9ecef;
-}
+        .complaint-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
 
-.timeline-item {
-    position: relative;
-    padding-bottom: 20px;
-}
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
 
-.timeline-item:last-child {
-    padding-bottom: 0;
-}
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
 
-.timeline-dot {
-    position: absolute;
-    left: -30px;
-    top: 4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #fff;
-    border: 3px solid #0d6efd;
-    z-index: 1;
-}
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #0d6efd;
+            z-index: 1;
+        }
 
-.timeline-content {
-    background: #f8f9fa;
-    padding: 12px 15px;
-    border-radius: 8px;
-    border: 1px solid #edf2f7;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
 
-.timeline-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
 
-.timeline-date {
-    font-size: 0.75rem;
-    color: #718096;
-    font-weight: 500;
-}
+        .timeline-date {
+            font-size: 0.75rem;
+            color: #718096;
+            font-weight: 500;
+        }
 
-.timeline-note {
-    font-size: 0.875rem;
-    color: #4a5568;
-    line-height: 1.5;
-}
+        .timeline-note {
+            font-size: 0.875rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
 
-.card {
-    border: none;
-    border-radius: 10px;
-}
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
 
-.card-body {
-    padding: 1.5rem;
-}
+        .card-body {
+            padding: 1.5rem;
+        }
 
-.shadow-sm {
-    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
-}
+        .shadow-sm {
+            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+        }
 
-.bg-light {
-    background-color: #f8f9fa!important;
-}
+        .bg-light {
+            background-color: #f8f9fa !important;
+        }
 
-.rounded {
-    border-radius: 0.5rem!important;
-}
+        .rounded {
+            border-radius: 0.5rem !important;
+        }
 
-.form-control:focus, .form-select:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
-}
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
 
-.btn-primary {
-    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-    border: none;
-    padding: 0.5rem 1.5rem;
-}
+        .btn-primary {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            border: none;
+            padding: 0.5rem 1.5rem;
+        }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #357abd 0%, #2c6aa0 100%);
-}
-</style>
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #357abd 0%, #2c6aa0 100%);
+        }
+    </style>
 
-@include('components.document-viewer')
+    @include('components.document-viewer')
 @endsection

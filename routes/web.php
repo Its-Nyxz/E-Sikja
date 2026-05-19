@@ -134,6 +134,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{id}', [MyRequestController::class, 'update'])->name('pengajuan-saya.update');
         Route::delete('/delete/{id}', [MyRequestController::class, 'destroy'])->name('pengajuan-saya.destroy');
         Route::get('/check', [MyRequestController::class, 'checkStatus'])->name('pengajuan-saya.check');
+        Route::get('document/{id}/preview', [MyRequestController::class, 'previewDocument'])
+            ->name('pengajuan-saya.document.preview');
     });
 
     Route::prefix('pengaduan-saya')->group(function () {
@@ -145,6 +147,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{id}', [MyComplaintController::class, 'update'])->name('pengaduan-saya.update');
         Route::delete('/delete/{id}', [MyComplaintController::class, 'destroy'])->name('pengaduan-saya.destroy');
         Route::get('/check', [MyComplaintController::class, 'checkStatus'])->name('pengaduan-saya.check');
+        Route::get('/pengaduan-saya/gambar/{id}', [MyComplaintController::class, 'gambar'])
+            ->name('pengaduan.gambar');
     });
 
 

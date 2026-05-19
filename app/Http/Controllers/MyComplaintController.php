@@ -9,6 +9,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class MyComplaintController extends Controller
@@ -38,10 +39,10 @@ class MyComplaintController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('created_at', function($row) {
+                ->addColumn('created_at', function ($row) {
                     return date('d-m-Y', strtotime($row->created_at));
                 })
-                ->addColumn('status', function($row) {
+                ->addColumn('status', function ($row) {
                     $badge = '<span class="badge bg-';
                     switch ($row->status) {
                         case 'Diajukan':
@@ -61,13 +62,13 @@ class MyComplaintController extends Controller
 
                     return $badge;
                 })
-                ->addColumn('action', function($row) {
+                ->addColumn('action', function ($row) {
                     $actionBtn = '<div class="btn-group" role="group" aria-label="Basic example">';
-                    $actionBtn .= '<a href="javascript:void(0)" class="btn btn-info btn-sm" data-id="'.$row->id.'"><span class="fa fa-eye"></span></a>';
+                    $actionBtn .= '<a href="javascript:void(0)" class="btn btn-info btn-sm" data-id="' . $row->id . '"><span class="fa fa-eye"></span></a>';
                     if ($row->status == 'Diajukan') {
-                        $actionBtn .= '<a href="'.route('pengaduan-saya.edit', $row->id).'" class="btn btn-warning btn-sm"><span class="fa fa-edit"></span></a>';
-                        $actionBtn .= '<form action="'.route('pengaduan-saya.destroy', $row->id).'" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus pengaduan ini?\');">
-                                        '.csrf_field().method_field('DELETE').'
+                        $actionBtn .= '<a href="' . route('pengaduan-saya.edit', $row->id) . '" class="btn btn-warning btn-sm"><span class="fa fa-edit"></span></a>';
+                        $actionBtn .= '<form action="' . route('pengaduan-saya.destroy', $row->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus pengaduan ini?\');">
+                                        ' . csrf_field() . method_field('DELETE') . '
                                         <button type="submit" class="btn btn-danger btn-sm"><span class="fa fa-trash"></span></button>
                                        </form>';
                     }
@@ -177,7 +178,7 @@ class MyComplaintController extends Controller
     {
         $complaint = Auth::user()->complaints()->findOrFail($id);
         $histories = json_decode($complaint->histories, true);
-        
+
         // Format histories with user names
         $formattedHistories = [];
         foreach ($histories as $history) {
@@ -189,7 +190,7 @@ class MyComplaintController extends Controller
                 'note' => $history['note']
             ];
         }
-        
+
         return response()->json([
             'code' => $complaint->code,
             'title' => $complaint->title,
@@ -208,19 +209,21 @@ class MyComplaintController extends Controller
      */
     public function edit(string $id)
     {
-        $data = [
-            'title' => 'Edit Pengaduan',
-            'complaint' => Auth::user()->complaints()->findOrFail($id)
-        ];
+        $complaint = Auth::user()->complaints()->findOrFail($id);
 
         return response()->json([
             'csrf_token' => csrf_token(),
-            'title' => $data['title'],
-            'complaint' => $data['complaint']
+            'title' => 'Edit Pengaduan',
+            'complaint' => [
+                'id' => $complaint->id,
+                'title' => $complaint->title,
+                'description' => $complaint->description,
+                'location' => $complaint->location,
+                'date' => $complaint->date ? date('Y-m-d\TH:i', strtotime($complaint->date)) : '',
+                'image' => $complaint->image,
+                'image_url' => $complaint->image ? route('pengaduan.gambar', $complaint->id) : null,
+            ],
         ]);
-
-
-        // return view('cms.my-complaint.edit')->with($data);
     }
 
     /**
@@ -239,7 +242,7 @@ class MyComplaintController extends Controller
         DB::beginTransaction();
         try {
             $complaint = Auth::user()->complaints()->findOrFail($id);
-            
+
             if ($complaint->status != 'Diajukan') {
                 return redirect()->back()
                     ->with('error', 'Pengaduan tidak dapat diubah karena sudah diproses');
@@ -249,7 +252,7 @@ class MyComplaintController extends Controller
             $complaint->description = $validated['description'];
             $complaint->location = $validated['location'];
 
-             if ($request->hasFile('image')) {
+            if ($request->hasFile('image')) {
                 if ($complaint->image) {
                     // Delete old file from storage
                     $oldStoragePath = storage_path('app/private/' . $complaint->image);
@@ -262,7 +265,7 @@ class MyComplaintController extends Controller
                         unlink($oldPublicPath);
                     }
                 }
-                
+
                 $image = $request->file('image');
                 $imageName = Str::random(32) . '.' . $image->getClientOriginalExtension();
                 $image->storeAs($this->pathUpload, $imageName, 'private');
@@ -285,7 +288,6 @@ class MyComplaintController extends Controller
                 'status' => 'success',
                 'message' => 'Pengaduan berhasil diperbarui'
             ]);
-
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
@@ -303,7 +305,7 @@ class MyComplaintController extends Controller
         DB::beginTransaction();
         try {
             $complaint = Auth::user()->complaints()->findOrFail($id);
-            
+
             if ($complaint->status != 'Diajukan') {
                 return redirect()->back()
                     ->with('error', 'Pengaduan tidak dapat dihapus karena sudah diproses');
@@ -323,7 +325,7 @@ class MyComplaintController extends Controller
     public function checkStatus(Request $request)
     {
         $nomorPengaduan = $request->nomor_pengaduan;
-        
+
         if (!$nomorPengaduan) {
             return response()->json([
                 'success' => false,
@@ -344,7 +346,7 @@ class MyComplaintController extends Controller
         $statusMessage = '';
         $details = '';
 
-        switch($complaint->status) {
+        switch ($complaint->status) {
             case 'Diajukan':
                 $statusMessage = 'Pengaduan Anda sedang dalam proses verifikasi';
                 break;
@@ -378,5 +380,25 @@ class MyComplaintController extends Controller
             'history' => $histories
         ]);
     }
-}
 
+    public function gambar($id)
+    {
+        $complaint = Auth::user()->complaints()->findOrFail($id);
+
+        if (!$complaint->image) {
+            abort(404);
+        }
+
+        $path = ltrim($complaint->image, '/');
+
+        if (Storage::disk('private')->exists($path)) {
+            return response(Storage::disk('private')->get($path), 200, [
+                'Content-Type' => Storage::disk('private')->mimeType($path) ?? 'image/jpeg',
+                'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            ]);
+        }
+
+        abort(404, 'Foto tidak ditemukan.');
+    }
+}
