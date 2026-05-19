@@ -188,13 +188,21 @@ class MyRequestController extends Controller
      */
     public function show(string $id)
     {
-        $data = [
-            'title' => 'Detail Pengajuan',
-            'requestLetter' => Auth::user()->requestLetters()->findOrFail($id),
-            'requestTypes' => RequestType::where('status', true)->get()
-        ];
+        $requestLetter = Auth::user()
+            ->requestLetters()
+            ->with([
+                'requestType',
+                'documentRequestLetters',
+                'historyRequestLetters',
+                'user.resident',
+            ])
+            ->findOrFail($id);
 
-        return view('cms.my-request.show')->with($data);
+        return view('cms.my-request.show', [
+            'title' => 'Detail Pengajuan',
+            'requestLetter' => $requestLetter,
+            'requestTypes' => RequestType::where('status', true)->get(),
+        ]);
     }
 
     /**
