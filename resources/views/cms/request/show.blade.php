@@ -52,11 +52,13 @@
                                             </div>
                                             <div class="row mb-3">
                                                 <div class="col-md-5 fw-bold">NIK</div>
-                                                <div class="col-md-7">{{ $requestLetter->user->resident->nik }}</div>
+                                                <div class="col-md-7">{{ $requestLetter->user?->resident?->nik ?? '-' }}
+                                                </div>
                                             </div>
                                             <div class="row mb-3">
                                                 <div class="col-md-5 fw-bold">Alamat</div>
-                                                <div class="col-md-7">{{ $requestLetter->user->resident->address }}</div>
+                                                <div class="col-md-7">{{ $requestLetter->user?->resident?->address ?? '-' }}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

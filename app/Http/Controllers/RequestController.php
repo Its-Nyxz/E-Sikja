@@ -94,12 +94,29 @@ class RequestController extends Controller
 
     public function show($id)
     {
-        $data = [
-            'title' => 'Detail Pengajuan',
-            'requestLetter' => RequestLetter::find($id)
-        ];
+        $requestLetter = RequestLetter::with([
+            'requestType',
+            'user.resident',
+            'documentRequestLetters',
+            'historyRequestLetters'
+        ])->findOrFail($id);
 
-        return view('cms.request.show', $data);
+        // if (!$requestLetter->user) {
+        //     return redirect()
+        //         ->route('data-pengajuan.index')
+        //         ->with('error', 'Data user/pemohon tidak ditemukan.');
+        // }
+
+        // if (!$requestLetter->user->resident) {
+        //     return redirect()
+        //         ->route('data-pengajuan.index')
+        //         ->with('error', 'Data kependudukan pemohon belum lengkap.');
+        // }
+
+        return view('cms.request.show', [
+            'title' => 'Detail Pengajuan',
+            'requestLetter' => $requestLetter
+        ]);
     }
 
     public function verifikasiOperator($id)
@@ -153,12 +170,35 @@ class RequestController extends Controller
             if ($status == 'Ditolak') {
                 $notes = "Pengajuan ditolak oleh petugas (" . Auth::user()->name . ")." . ($request->notes ? " Catatan: " . $request->notes : "");
             } else if ($status == 'Selesai') {
-                $typeCode = $requestLetter->requestType->code;
-                $documentNumber = "$typeCode/" . date('y') . "/" . date('m') . "/" . date('d');
-                $getLast = RequestLetter::where('request_type_id', $requestLetter->request_type_id)->latest()->first();
-                $lastNumber = $getLast ? intval(substr($getLast->document_number, -3)) + 1 : 1;
-                $documentNumber .= '/' . str_pad($lastNumber, 3, '0', STR_PAD_LEFT);
-                $data['document_number'] = $documentNumber;
+                if ($requestLetter->document_number) {
+                    $data['document_number'] = $requestLetter->document_number;
+                } else {
+                    $typeCode = $requestLetter->requestType->code;
+
+                    $prefix = $typeCode . '/' . date('y') . '/' . date('m') . '/' . date('d');
+
+                    $getLast = RequestLetter::where('request_type_id', $requestLetter->request_type_id)
+                        ->where('id', '!=', $requestLetter->id)
+                        ->whereNotNull('document_number')
+                        ->where('document_number', 'like', $prefix . '/%')
+                        ->orderBy('document_number', 'desc')
+                        ->lockForUpdate()
+                        ->first();
+
+                    $lastNumber = $getLast
+                        ? intval(substr($getLast->document_number, -3)) + 1
+                        : 1;
+
+                    $documentNumber = $prefix . '/' . str_pad($lastNumber, 3, '0', STR_PAD_LEFT);
+
+                    while (RequestLetter::where('document_number', $documentNumber)->exists()) {
+                        $lastNumber++;
+                        $documentNumber = $prefix . '/' . str_pad($lastNumber, 3, '0', STR_PAD_LEFT);
+                    }
+
+                    $data['document_number'] = $documentNumber;
+                }
+
                 $notes = "Pengajuan telah selesai diverifikasi oleh petugas (" . Auth::user()->name . ") dan dokumen sudah dapat dicetak." . ($request->notes ? " Catatan: " . $request->notes : "");
             } else if ($status == 'Diproses') {
                 $notes = "Pengajuan telah diverifikasi oleh petugas (" . Auth::user()->name . ") dan sedang diteruskan ke Admin untuk diproses." . ($request->notes ? " Catatan: " . $request->notes : "");
