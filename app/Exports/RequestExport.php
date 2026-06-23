@@ -54,8 +54,8 @@ class RequestExport implements FromQuery, WithMapping, WithHeadings, ShouldAutoS
             $requestLetter->code,
             $requestLetter->document_number ?? '-',
             date('d-m-Y', strtotime($requestLetter->created_at)),
-            $requestLetter->requestType->name,
-            $requestLetter->user->name,
+            $requestLetter->requestType?->name ?? '-',
+            $requestLetter->user?->name ?? '(User Dihapus)',
             $requestLetter->status,
         ];
     }

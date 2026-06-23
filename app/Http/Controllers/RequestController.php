@@ -86,10 +86,17 @@ class RequestController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $filters = $request->only(['status', 'date_from', 'date_to', 'request_type_id']);
-        $role = Auth::user()->role;
+        try {
+            $filters = $request->only(['status', 'date_from', 'date_to', 'request_type_id']);
+            $role = Auth::user()->role;
 
-        return Excel::download(new RequestExport($filters, $role), 'Data_Pengajuan_' . date('YmdHis') . '.xlsx');
+            return Excel::download(new RequestExport($filters, $role), 'Data_Pengajuan_' . date('YmdHis') . '.xlsx');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export gagal: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function show($id)

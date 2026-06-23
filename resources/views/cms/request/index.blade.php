@@ -42,6 +42,16 @@
     }
 </style>
 
+{{-- ===== TOAST NOTIFIKASI ===== --}}
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="export-toast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="export-toast-msg"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -241,15 +251,56 @@ $(document).ready(function () {
         reloadActive();
     });
 
+    // ---- Fungsi tampilkan toast ----
+    function showToast(message, type = 'danger') {
+        const toastEl = document.getElementById('export-toast');
+        const msgEl   = document.getElementById('export-toast-msg');
+        toastEl.className = 'toast align-items-center text-white border-0 bg-' + type;
+        msgEl.textContent = message;
+        const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+        toast.show();
+    }
+
     // ---- Export button ----
     $('#btn-export').on('click', function () {
+        const btn = $(this);
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Mengexport...');
+
         let url = "{{ route('data-pengajuan.export') }}?";
         url += "status=" + activeStatus;
         url += "&date_from=" + filterDateFrom;
         url += "&date_to=" + filterDateTo;
         url += "&request_type_id=" + filterTypeId;
-        
-        window.location.href = url;
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (response) {
+                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok || contentType.includes('application/json')) {
+                    // Server return JSON error
+                    return response.json().then(function (data) {
+                        throw new Error(data.message || 'Export gagal, silakan coba lagi.');
+                    });
+                }
+                return response.blob();
+            })
+            .then(function (blob) {
+                // Trigger download
+                const a = document.createElement('a');
+                const objectUrl = URL.createObjectURL(blob);
+                a.href = objectUrl;
+                a.download = 'Data_Pengajuan_' + Date.now() + '.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(objectUrl);
+                showToast('Export berhasil! File sedang diunduh.', 'success');
+            })
+            .catch(function (err) {
+                showToast(err.message, 'danger');
+            })
+            .finally(function () {
+                btn.prop('disabled', false).html('<i class="fas fa-file-excel"></i> Export Excel');
+            });
     });
 
     // ---- Allow pressing Enter on date inputs ----

@@ -1,0 +1,68 @@
+=== File: Revisi (d:\File's Niko\Kuliah\PKL\Laporan Magang Nikolas Pramuputro 2021061011 revisi.docx) ===
+Total tables: 8
+
+Table 1: Rows=1, Columns=2
+  Row 1: Nikolas Pramuputro | 2021061011
+
+Table 2: Rows=7, Columns=3
+  Row 1: JUDUL | : | Pelaksanaan Kerja Praktik Magang Web Developer di PT. Sanityasa Anjaya Daniswara
+  Row 2: NAMA/NIM | : | Nikolas Pramuputro / 2021061011
+
+Table 3: Rows=4, Columns=2
+  Row 1: Dosen PembimbingHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055 | MentorRendy Setiotomo
+  Row 2: Mengetahui,Koordinator Program Studi InformatikaHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055
+
+Table 4: Rows=4, Columns=2
+  Row 1: Dosen PembimbingHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055 | MentorRendy Setiotomo
+  Row 2: Mengetahui,Koordinator Program Studi InformatikaHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055
+
+Table 5: Rows=3, Columns=2
+  Row 1:  | Surakarta, 27 Juni 2024
+  Row 2:  | 
+
+Table 6: Rows=2, Columns=3
+  Row 1: Alamat Instansi | : | Jl. Kahuripan Tim. No.108, Sumber, Kec. Banjarsari, Kota Surakarta, Jawa Tengah 57138
+  Row 2: Link Google Map | : | https://maps.app.goo.gl/KWWWkSeg71U33LtFA
+
+Table 7: Rows=1, Columns=3
+  Row 1: Gambar Maps | : | Gambar 2.2 Lokasi Tempat Instansi
+
+Table 8: Rows=101, Columns=7
+  Row 1: No. | Tanggal | Nama Kegiatan | Jam Mula i | Jam Selesai | Durasi (menit) | Mengetahui
+  Row 2:  |  |  |  |  |  | Pembimbing Mitra (Jika Ada) | Dosen Pembimbing
+
+
+
+=== File: Original (d:\File's Niko\Kuliah\PKL\Laporan Magang Nikolas Pramuputro 2021061011.docx) ===
+Total tables: 8
+
+Table 1: Rows=1, Columns=2
+  Row 1: Nikolas Pramuputro | 2021061011
+
+Table 2: Rows=7, Columns=3
+  Row 1: JUDUL | : | Pelaksanaan Kerja Praktik Magang Web Developer di PT. Sanityasa Anjaya Daniswara
+  Row 2: NAMA/NIM | : | Nikolas Pramuputro / 2021061011
+
+Table 3: Rows=4, Columns=2
+  Row 1: Dosen PembimbingHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055 | MentorRendy Setiomoto
+  Row 2: Mengetahui,Koordinator Program Studi InformatikaHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055
+
+Table 4: Rows=4, Columns=2
+  Row 1: Dosen PembimbingHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055 | MentorRendy Setiomoto
+  Row 2: Mengetahui,Koordinator Program Studi InformatikaHardika Khusnuliawati, S.Kom., M.Kom.NIK. 03-201701-0055
+
+Table 5: Rows=3, Columns=2
+  Row 1:  | Surakarta, 27 Juni 2024
+  Row 2:  | 
+
+Table 6: Rows=2, Columns=3
+  Row 1: Alamat Instansi | : | Jl. Kahuripan Tim. No.108, Sumber, Kec. Banjarsari, Kota Surakarta, Jawa Tengah 57138
+  Row 2: Link Google Map | : | https://maps.app.goo.gl/KWWWkSeg71U33LtFA
+
+Table 7: Rows=1, Columns=3
+  Row 1: Gambar Maps | : | Gambar 2.2 Lokasi Tempat Instansi
+
+Table 8: Rows=101, Columns=7
+  Row 1: No. | Tanggal | Nama Kegiatan | Jam Mula i | Jam Selesai | Durasi (menit) | Mengetahui
+  Row 2:  |  |  |  |  |  | Pembimbing Mitra (Jika Ada) | Dosen Pembimbing
+
