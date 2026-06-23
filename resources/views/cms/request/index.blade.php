@@ -288,7 +288,11 @@ $(document).ready(function () {
                 const a = document.createElement('a');
                 const objectUrl = URL.createObjectURL(blob);
                 a.href = objectUrl;
-                a.download = 'Data_Pengajuan_' + Date.now() + '.xlsx';
+                // Susun nama file berdasarkan filter aktif
+                let parts = ['pengajuan', activeStatus];
+                if (filterDateFrom) parts.push(filterDateFrom);
+                if (filterDateTo)   parts.push(filterDateTo);
+                a.download = parts.join('_') + '.xlsx';
                 document.body.appendChild(a);
                 a.click();
                 a.remove();

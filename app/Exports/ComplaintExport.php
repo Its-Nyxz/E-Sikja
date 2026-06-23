@@ -53,7 +53,7 @@ class ComplaintExport implements FromQuery, WithMapping, WithHeadings, ShouldAut
         return [
             $complaint->code,
             date('d-m-Y H:i', strtotime($complaint->created_at)),
-            $complaint->user->name,
+            $complaint->user?->name ?? '(User Dihapus)',
             $complaint->title,
             $complaint->location,
             $complaint->status,
