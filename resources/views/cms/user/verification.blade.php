@@ -39,7 +39,7 @@
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">Status</label>
                                                 <p class="mb-0">
-                                                    @if($user->is_verified)
+                                                    @if($user->status == 'Aktif')
                                                         <span class="badge bg-success">Terverifikasi</span>
                                                     @else
                                                         <span class="badge bg-warning">Menunggu Verifikasi</span>
@@ -164,9 +164,11 @@
                                 {{-- <button type="button" class="btn btn-danger" onclick="rejectUser({{ $user->id }})">
                                     <i class="fas fa-times"></i> Tolak
                                 </button> --}}
+                                @if($user->status == 'Menunggu Verifikasi')
                                 <button type="button" class="btn btn-success" onclick="verifyUser({{ $user->id }})">
                                     <i class="fas fa-check"></i> Verifikasi
                                 </button>
+                                @endif
                             </div>
                         </div>
                     </div>

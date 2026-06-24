@@ -67,7 +67,7 @@
                                             <small class="text-muted">{{ $notification->text }}</small>
                                         </div>
                                         @if ($notification->link)
-                                            <a href="{{ $notification->link }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Lihat {{ $notification->type }}</a>
+                                            <a href="{{ url($notification->link) }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">Lihat {{ $notification->type }}</a>
                                         @endif
                                     </td>
                                     <td style="width: 20%">

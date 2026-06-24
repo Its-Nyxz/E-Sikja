@@ -132,9 +132,6 @@ class RequestController extends Controller
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $requestLetter = RequestLetter::find($id);
-        if ($requestLetter->status != 'Diajukan') {
-            return redirect('dashboard')->with('error', 'Pengajuan tidak dapat diverifikasi')->send();
-        }
         $data = [
             'title' => 'Verifikasi Operator',
             'requestLetter' => $requestLetter
@@ -149,9 +146,6 @@ class RequestController extends Controller
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $requestLetter = RequestLetter::find($id);
-        if ($requestLetter->status != 'Diproses') {
-            return redirect('dashboard')->with('error', 'Pengajuan tidak dapat diverifikasi')->send();
-        }
         $data = [
             'title' => 'Verifikasi Admin',
             'requestLetter' => $requestLetter

@@ -205,14 +205,9 @@ class UserController extends Controller
     function verification($id)
     {
         $user = User::findOrFail($id);
-        if ($user->status == 'Aktif') {
-            return redirect()
-                ->route('manajemen-pengguna.index')
-                ->with('error', 'Data Pengguna sudah aktif');
-        }
         $data = [
             'title' => 'Verifikasi Pendaftaran',
-            'user' => User::findOrFail($id)
+            'user' => $user
         ];
         return view('cms.user.verification')->with($data);
     }
