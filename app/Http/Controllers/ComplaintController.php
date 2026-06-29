@@ -49,8 +49,8 @@ class ComplaintController extends Controller
                 ->addColumn('action', function($row) {
                     $actionBtn = '';
                     
-                    if ($row->status == 'Diajukan' || ($row->status == 'Diproses' && Auth::user()->role == 'admin')) {
-                        $actionBtn = '<a href="'.route('data-pengaduan.verifikasi-'.Auth::user()->role, $row->id).'" class="btn btn-sm btn-primary">
+                    if ($row->status == 'Diajukan' || ($row->status == 'Diproses' && in_array(Auth::user()->role, ['admin', 'superadmin']))) {
+                        $actionBtn = '<a href="'.route('data-pengaduan.verifikasi-'.(Auth::user()->role === 'superadmin' ? 'admin' : Auth::user()->role), $row->id).'" class="btn btn-sm btn-primary">
                             <i class="fas fa-check"></i> Verifikasi
                         </a>';
                     }
@@ -88,7 +88,7 @@ class ComplaintController extends Controller
     }
 
     public function verifikasiOperator($id){
-        if(Auth::user()->role != 'operator'){
+        if(!in_array(Auth::user()->role, ['operator', 'superadmin'])){
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $complaint = Complaint::with('user')->findOrFail($id);
@@ -102,7 +102,7 @@ class ComplaintController extends Controller
 
     public function verifikasiAdmin($id){
         // dd($id, Auth::user()->role);
-        if(Auth::user()->role != 'admin'){
+        if(!in_array(Auth::user()->role, ['admin', 'superadmin'])){
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $complaint = Complaint::with('user')->findOrFail($id);
@@ -115,7 +115,7 @@ class ComplaintController extends Controller
 
     public function verifikasiProcess(Request $request, $id)
     {
-        if(Auth::user()->role != 'operator'){
+        if(!in_array(Auth::user()->role, ['operator', 'superadmin'])){
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $request->validate([
@@ -188,7 +188,7 @@ class ComplaintController extends Controller
 
     public function verifikasiAdminProcess(Request $request, $id)
     {
-        if(Auth::user()->role != 'admin'){
+        if(!in_array(Auth::user()->role, ['admin', 'superadmin'])){
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $request->validate([

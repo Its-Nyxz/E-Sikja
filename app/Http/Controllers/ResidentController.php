@@ -37,7 +37,7 @@ class ResidentController extends Controller
                     $show = '<a href="'.route('data-masyarakat.show', $row->id).'" class="btn btn-sm btn-info"><span class="fa fa-eye"></span></a>';
                     $edit = '';
                     $delete = '';
-                    if (Auth::user()->role == 'admin') {
+                    if (in_array(Auth::user()->role, ['admin', 'superadmin'])) {
                         $edit = '<a href="'.route('data-masyarakat.edit', $row->id).'" class="btn btn-sm btn-warning"><span class="fa fa-edit"></span></a>';
                         $delete = '<form action="'.route('data-masyarakat.destroy', $row->id).'" method="post" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus data ini?\');">
                                     <button type="submit" class="btn btn-sm btn-danger"><span class="fa fa-trash"></span></button>

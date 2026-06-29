@@ -70,6 +70,16 @@ class DatabaseSeeder extends Seeder
             'status' => 'Aktif',
         ]);
 
+        // Superadmin: akses penuh termasuk delete master data, pengajuan, dan pengaduan
+        User::create([
+            'name' => 'Super Administrator',
+            'username' => 'superadmin',
+            'email' => 'superadmin@esikja.com',
+            'password' => bcrypt('superadmin123'),
+            'role' => 'superadmin',
+            'status' => 'Aktif',
+        ]);
+
         RequestType::insert([
             [
                 'code' => 'SKKEL',

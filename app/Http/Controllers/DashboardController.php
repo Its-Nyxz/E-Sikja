@@ -15,7 +15,7 @@ class DashboardController extends Controller
 {
     function index(){
 
-        if (Auth::user()->role === 'admin') {
+        if (Auth::user()->role === 'admin' || Auth::user()->role === 'superadmin') {
             return $this->admin();
         }else if (Auth::user()->role === 'operator') {
             return $this->operator();
@@ -91,7 +91,7 @@ class DashboardController extends Controller
 
     public function chartData(Request $request)
     {
-        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'operator') {
+        if (!in_array(Auth::user()->role, ['admin', 'superadmin', 'operator'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

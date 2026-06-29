@@ -56,11 +56,11 @@ class RequestController extends Controller
                 ->addColumn('action', function ($row) {
                     $actionBtn = '';
 
-                    if (($row->status == 'Diajukan' && Auth::user()->role == 'operator') || ($row->status == 'Diproses' && Auth::user()->role == 'admin')) {
-                        $actionBtn = '<a href="' . route('data-pengajuan.verifikasi-' . Auth::user()->role, $row->id) . '" class="btn btn-sm btn-primary">
+                    if (($row->status == 'Diajukan' && in_array(Auth::user()->role, ['operator', 'superadmin'])) || ($row->status == 'Diproses' && in_array(Auth::user()->role, ['admin', 'superadmin']))) {
+                        $actionBtn = '<a href="' . route('data-pengajuan.verifikasi-' . (Auth::user()->role === 'superadmin' ? 'admin' : Auth::user()->role), $row->id) . '" class="btn btn-sm btn-primary">
                             <i class="fas fa-check"></i> Verifikasi
                         </a>';
-                    } elseif ($row->status == 'Selesai' && Auth::user()->role == 'admin') {
+                    } elseif ($row->status == 'Selesai' && in_array(Auth::user()->role, ['admin', 'superadmin'])) {
                         $actionBtn = '<a target="_blank" href="' . route('data-pengajuan.print', $row->id) . '" class="btn btn-sm btn-success">
                             <i class="fas fa-print"></i> Print
                         </a>';
@@ -128,7 +128,7 @@ class RequestController extends Controller
 
     public function verifikasiOperator($id)
     {
-        if (Auth::user()->role != 'operator') {
+        if (!in_array(Auth::user()->role, ['operator', 'superadmin'])) {
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $requestLetter = RequestLetter::find($id);
@@ -142,7 +142,7 @@ class RequestController extends Controller
 
     public function verifikasiAdmin($id)
     {
-        if (Auth::user()->role != 'admin') {
+        if (!in_array(Auth::user()->role, ['admin', 'superadmin'])) {
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $requestLetter = RequestLetter::find($id);

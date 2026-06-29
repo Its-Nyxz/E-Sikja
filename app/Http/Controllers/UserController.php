@@ -16,7 +16,7 @@ class UserController extends Controller
     
     public function __construct()
     {
-        if (Auth::user()->role != 'admin' && (request()->routeIs('profile.index') === false && request()->routeIs('profile.update') === false)) {
+        if (!in_array(Auth::user()->role, ['admin', 'superadmin']) && (request()->routeIs('profile.index') === false && request()->routeIs('profile.update') === false)) {
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
     }
@@ -81,7 +81,7 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,operator,masyarakat',
+            'role' => 'required|in:admin,superadmin,operator,masyarakat',
             'status' => 'required|in:Aktif,Tidak Aktif',
         ]);
 
@@ -144,7 +144,7 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:users,username,' . $id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8',
-            'role' => 'required|in:admin,operator,masyarakat',
+            'role' => 'required|in:admin,superadmin,operator,masyarakat',
             'status' => 'required|in:Aktif,Tidak Aktif',
         ]);
 
