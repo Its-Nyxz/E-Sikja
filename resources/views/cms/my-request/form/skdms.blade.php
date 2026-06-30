@@ -40,7 +40,7 @@
                     <label for="dob" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                     <input type="date" class="form-control @error('dob') is-invalid @enderror" id="dob"
                         name="dob"
-                        value="{{ old('dob', isset($requestLetter->dob) ? date('Y-m-d', strtotime($requestLetter->dob)) : (isset($resident->dob) ? date('Y-m-d', strtotime($resident->dob)) : '')) }}"
+                        value="{{ old('dob', isset($requestLetter) ? date('Y-m-d', strtotime($requestLetter->dob)) : (isset($resident->dob) ? date('Y-m-d', strtotime($resident->dob)) : '')) }}"
                         required>
                     @error('dob')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -164,7 +164,7 @@
                                 @if ($documentFile)
                                     <div class="mb-2">
                                         <button type="button" class="btn btn-sm btn-info"
-                                            onclick='openDocumentViewer(@json(route('pengajuan-saya.document.preview', $documentFile->id)), @json($documentFile->name))'>
+                                            onclick='openDocumentViewer(@json(route('dokumen.lihat', $documentFile->id)), @json($documentFile->name))'>
                                             <i class="fas fa-eye"></i> Lihat File
                                         </button>
                                     </div>

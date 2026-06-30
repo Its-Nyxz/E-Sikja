@@ -249,7 +249,7 @@
                                 @if ($documentFile)
                                     <div class="mb-2">
                                         <button type="button" class="btn btn-sm btn-info"
-                                            onclick='openDocumentViewer(@json(route('pengajuan-saya.document.preview', $documentFile->id)), @json($documentFile->name))'>
+                                            onclick='openDocumentViewer(@json(route('dokumen.lihat', $documentFile->id)), @json($documentFile->name))'>
                                             <i class="fas fa-eye"></i> Lihat File
                                         </button>
                                     </div>

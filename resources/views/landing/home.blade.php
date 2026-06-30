@@ -75,7 +75,7 @@
                     <div class="info-card">
                         <i class="fas fa-check-circle"></i>
                         <h3>3. Proses Verifikasi</h3>
-                        <p>Tim Kelurahan akan memverifikasi pengajuan Anda. Status dapat dicek melalui dashboard.</p>
+                        <p>Tim Kelurahan akan memverifikasi pengajuan Anda. Status dapat dicek melalui dashboard pengajuan.</p>
                     </div>
                 </div>
             </div>
@@ -89,9 +89,9 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="info-card">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <h3>1. Login</h3>
-                        <p>Login ke akun Anda untuk mengakses fitur pengaduan.</p>
+                        <i class="fas fa-user-plus"></i>
+                        <h3>1. Daftar Akun</h3>
+                        <p>Buat akun baru melalui tombol daftar di atas. Isi data diri dengan lengkap dan valid.</p>
                     </div>
                 </div>
                 <div class="col-md-4">

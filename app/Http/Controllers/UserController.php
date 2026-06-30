@@ -26,7 +26,7 @@ class UserController extends Controller
     public function index()
     {
         if(request()->ajax()) {
-             $query = User::query();
+             $query = User::where('role', '!=', 'superadmin');
             return DataTables::of($query)
                 ->editColumn('created_at', function($row){
                     return (new \DateTime($row->created_at))->format('d-m-Y H:i');
@@ -127,9 +127,14 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
+        $user = User::findOrFail($id);
+        if ($user->role === 'superadmin' && Auth::user()->role !== 'superadmin') {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengedit pengguna ini.');
+        }
+
         $data = [
             'title' => 'Edit Data Pengguna',
-            'user' => User::findOrFail($id)
+            'user' => $user
         ];
         return view('cms.user.edit')->with($data);
     }
@@ -159,6 +164,9 @@ class UserController extends Controller
             \DB::beginTransaction();
             
             $user = User::findOrFail($id);
+            if ($user->role === 'superadmin' && Auth::user()->role !== 'superadmin') {
+                abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengguna ini.');
+            }
             
             $data = $request->all();
             if (!empty($data['password'])) {
@@ -190,6 +198,9 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
+            if ($user->role === 'superadmin') {
+                abort(403, 'Superadmin tidak dapat dihapus.');
+            }
             $user->delete();
             return redirect()
                 ->route('manajemen-pengguna.index')

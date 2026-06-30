@@ -96,16 +96,6 @@
                                         <div class="card-body">
                                             <h5 class="card-title border-bottom pb-2 mb-4">Dokumen Lampiran</h5>
                                             @foreach ($requestLetter->documentRequestLetters as $index => $document)
-                                                @php
-                                                    $fileUrl = asset($document->url);
-                                                    $extension = strtolower(
-                                                        pathinfo(
-                                                            parse_url($document->url, PHP_URL_PATH),
-                                                            PATHINFO_EXTENSION,
-                                                        ),
-                                                    );
-                                                @endphp
-
                                                 <div
                                                     class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded">
                                                     <div>
@@ -114,7 +104,7 @@
                                                     </div>
 
                                                     <button type="button" class="btn btn-sm btn-info"
-                                                        onclick="openDocumentViewer('{{ $fileUrl }}', '{{ $document->name }}')">
+                                                        onclick="openDocumentViewer('{{ route('dokumen.lihat', $document->id) }}', '{{ $document->name }}')">
                                                         <i class="fas fa-eye"></i> Lihat
                                                     </button>
                                                 </div>

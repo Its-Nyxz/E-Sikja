@@ -58,6 +58,13 @@ class ComplaintController extends Controller
                     $actionBtn .= ' <button type="button" class="btn btn-sm btn-info btn-detail" data-id="'.$row->id.'">
                         <i class="fas fa-eye"></i> Detail
                     </button>';
+
+                    if (Auth::user()->role === 'superadmin') {
+                        $actionBtn .= ' <form action="' . route('data-pengaduan.destroy', $row->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus pengaduan ini?\');">
+                                            ' . csrf_field() . method_field('DELETE') . '
+                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                                        </form>';
+                    }
                     
                     return $actionBtn;
                 })
@@ -260,6 +267,23 @@ class ComplaintController extends Controller
                 'histories' => $histories
             ]
         ]);
+    }
+
+    public function destroy($id)
+    {
+        if (Auth::user()->role !== 'superadmin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        try {
+            $complaint = Complaint::findOrFail($id);
+            $complaint->delete();
+            return redirect()->route('data-pengaduan.index')
+                ->with('success', 'Pengaduan berhasil dihapus');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }
 

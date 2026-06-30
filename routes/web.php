@@ -116,6 +116,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export-excel', [RequestController::class, 'exportExcel'])->name('data-pengajuan.export');
         Route::get('show/{id}', [RequestController::class, 'show'])->name('data-pengajuan.show');
         Route::get('/print/{id}', [RequestController::class, 'print'])->name('data-pengajuan.print');
+        Route::delete('/delete/{id}', [RequestController::class, 'destroy'])->name('data-pengajuan.destroy');
 
         Route::get('verifikasi-operator/{id}', [RequestController::class, 'verifikasiOperator'])->name('data-pengajuan.verifikasi-operator');
         Route::put('verifikasi-operator/{id}', [RequestController::class, 'updateVerifikasi'])->name('verifikasi-operator.update');
@@ -148,7 +149,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/delete/{id}', [MyComplaintController::class, 'destroy'])->name('pengaduan-saya.destroy');
         Route::get('/check', [MyComplaintController::class, 'checkStatus'])->name('pengaduan-saya.check');
         Route::get('/pengaduan-saya/gambar/{id}', [MyComplaintController::class, 'gambar'])
-            ->name('pengaduan.gambar');
+            ->name('pengaduan-saya.gambar');
     });
 
 
@@ -156,6 +157,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [ComplaintController::class, 'index'])->name('data-pengaduan.index');
         Route::get('/export-excel', [ComplaintController::class, 'exportExcel'])->name('data-pengaduan.export');
         Route::get('/show/{id}', [ComplaintController::class, 'show'])->name('data-pengaduan.show');
+        Route::delete('/delete/{id}', [ComplaintController::class, 'destroy'])->name('data-pengaduan.destroy');
         Route::get('verifikasi-operator/{id}', [ComplaintController::class, 'verifikasiOperator'])->name('data-pengaduan.verifikasi-operator');
         Route::post('verifikasi-process/{id}', [ComplaintController::class, 'verifikasiProcess'])->name('data-pengaduan.verifikasi-process');
         Route::get('verifikasi-admin/{id}', [ComplaintController::class, 'verifikasiAdmin'])->name('data-pengaduan.verifikasi-admin');

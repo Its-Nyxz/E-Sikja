@@ -154,6 +154,7 @@ class RequestTypeController extends Controller
         try {
             DB::beginTransaction();
 
+            $requestType = RequestType::findOrFail($id);
             $requestType->delete();
 
             DB::commit();

@@ -45,7 +45,7 @@
                     <label for="husband_dob" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                     <input type="date" class="form-control @error('husband_dob') is-invalid @enderror"
                         id="husband_dob" name="husband_dob"
-                        value="{{ old('husband_dob', isset($requestLetter->husband_dob) ? date('Y-m-d', strtotime($requestLetter->husband_dob)) : '') }}"
+                        value="{{ old('husband_dob', isset($requestLetter) ? date('Y-m-d', strtotime($requestLetter->husband_dob)) : '') }}"
                         required>
                     @error('husband_dob')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -148,7 +148,7 @@
                     <label for="wife_dob" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                     <input type="date" class="form-control @error('wife_dob') is-invalid @enderror"
                         id="wife_dob" name="wife_dob"
-                        value="{{ old('wife_dob', isset($requestLetter->wife_dob) ? date('Y-m-d', strtotime($requestLetter->wife_dob)) : '') }}"
+                        value="{{ old('wife_dob', isset($requestLetter) ? date('Y-m-d', strtotime($requestLetter->wife_dob)) : '') }}"
                         required>
                     @error('wife_dob')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -239,7 +239,7 @@
                             class="text-danger">*</span></label>
                     <input type="date" class="form-control @error('marriage_date') is-invalid @enderror"
                         id="marriage_date" name="marriage_date"
-                        value="{{ old('marriage_date', isset($requestLetter->marriage_date) ? date('Y-m-d', strtotime($requestLetter->marriage_date)) : '') }}"
+                        value="{{ old('marriage_date', isset($requestLetter) ? date('Y-m-d', strtotime($requestLetter->marriage_date)) : '') }}"
                         required>
                     @error('marriage_date')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -268,7 +268,7 @@
                                 @if ($documentFile)
                                     <div class="mb-2">
                                         <button type="button" class="btn btn-sm btn-info"
-                                            onclick='openDocumentViewer(@json(route('pengajuan-saya.document.preview', $documentFile->id)), @json($documentFile->name))'>
+                                            onclick='openDocumentViewer(@json(route('dokumen.lihat', $documentFile->id)), @json($documentFile->name))'>
                                             <i class="fas fa-eye"></i> Lihat File
                                         </button>
                                     </div>

@@ -65,8 +65,8 @@
                         <div class="timeline-item">
                             <div class="timeline-number">6</div>
                             <div class="timeline-content">
-                                <h6>Ambil Surat</h6>
-                                <p class="text-muted small">Ambil surat di kantor desa/kelurahan setelah disetujui</p>
+                                <h6>Cetak Surat Mandiri</h6>
+                                <p class="text-muted small">Surat tidak perlu diambil di kelurahan, Anda dapat mencetaknya sendiri setelah disetujui</p>
                             </div>
                         </div>
                     </div>

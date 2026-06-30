@@ -13,7 +13,7 @@
                         <i class="fas fa-info-circle fa-3x text-primary"></i>
                     </div>
                     <h4 class="text-center mb-4">Informasi Pengaduan</h4>
-                    <p class="text-muted text-center">Layanan pengaduan tersedia untuk membantu masyarakat menyampaikan keluhan, saran, dan masukan terkait layanan desa/kelurahan.</p>
+                    <p class="text-muted text-center">Layanan pengaduan tersedia untuk membantu masyarakat menyampaikan keluhan secara cepat dan tepat.</p>
                 </div>
             </div>
         </div>
@@ -51,8 +51,8 @@
                         <div class="timeline-item">
                             <div class="timeline-number">4</div>
                             <div class="timeline-content">
-                                <h6>Tunggu Respon</h6>
-                                <p class="text-muted small">Tim akan menghubungi Anda</p>
+                                <h6>Tunggu Proses</h6>
+                                <p class="text-muted small">Tim kelurahan akan memproses pengaduan Anda. Status dapat dicek melalui dashboard pengaduan.</p>
                             </div>
                         </div>
                     </div>

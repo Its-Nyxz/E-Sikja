@@ -70,6 +70,13 @@ class RequestController extends Controller
                         </a>';
                     }
 
+                    if (Auth::user()->role === 'superadmin') {
+                        $actionBtn .= ' <form action="' . route('data-pengajuan.destroy', $row->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus pengajuan ini?\');">
+                                            ' . csrf_field() . method_field('DELETE') . '
+                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                                        </form>';
+                    }
+
                     return $actionBtn;
                 })
                 ->rawColumns(['action', 'status'])
@@ -296,5 +303,22 @@ class RequestController extends Controller
         $filename = 'pengajuan-' . str_replace(['/', '\\'], '-', $requestLetter->code) . '.pdf';
 
         return $pdf->stream($filename);
+    }
+
+    public function destroy($id)
+    {
+        if (Auth::user()->role !== 'superadmin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        try {
+            $requestLetter = RequestLetter::findOrFail($id);
+            $requestLetter->delete();
+            return redirect()->route('data-pengajuan.index')
+                ->with('success', 'Pengajuan berhasil dihapus');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

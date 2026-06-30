@@ -12,7 +12,7 @@ class SettingController extends Controller
 
     public function __construct()
     {
-        if(Auth::user()->role != 'admin') {
+        if (!in_array(Auth::user()->role, ['admin', 'superadmin'])) {
             return redirect('dashboard')->with('error', 'Anda tidak memiliki hak akses')->send();
         }
         $this->settingsPath = public_path('setting/settings.json');
