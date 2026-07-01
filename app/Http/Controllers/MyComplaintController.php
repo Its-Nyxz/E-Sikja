@@ -174,9 +174,14 @@ class MyComplaintController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
         $complaint = Auth::user()->complaints()->findOrFail($id);
+
+        if (!$request->ajax() && !$request->wantsJson()) {
+            return redirect()->route('pengaduan-saya.index', ['show_id' => $id]);
+        }
+
         $histories = json_decode($complaint->histories, true);
 
         // Format histories with user names

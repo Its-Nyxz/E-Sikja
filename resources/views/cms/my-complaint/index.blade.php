@@ -404,11 +404,8 @@
                 });
             });
 
-            // Handle show button click
-            $(document).on('click', '.btn-info', function(e) {
-                e.preventDefault();
-                var id = $(this).data('id');
-
+            // Function to load and show complaint detail
+            function showComplaintDetail(id) {
                 // Get complaint data
                 $.get("{{ url('pengaduan-saya') }}/show/" + id, function(data) {
                     // Update modal content
@@ -457,7 +454,21 @@
                     var modal = new bootstrap.Modal(document.getElementById('detailModal'));
                     modal.show();
                 });
+            }
+
+            // Handle show button click
+            $(document).on('click', '.btn-info', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                showComplaintDetail(id);
             });
+
+            // Check if there is a show_id in the URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var showId = urlParams.get('show_id');
+            if (showId) {
+                showComplaintDetail(showId);
+            }
         });
     </script>
 @endpush
