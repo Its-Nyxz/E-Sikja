@@ -14,10 +14,15 @@
             <!-- Information Detail Card -->
             <div class="info-card">
                 @if($information->image)
-                    <img src="{{ asset( $information->image) }}" 
-                         alt="{{ $information->title }}" 
-                         class="img-fluid rounded mb-4 w-100"
-                         style="max-height: 400px; object-fit: cover;">
+                    <div class="image-preview-container rounded mb-4" style="max-height: 400px; overflow: hidden;" data-bs-toggle="modal" data-bs-target="#imagePreviewModal" data-preview-src="{{ asset($information->image) }}" data-preview-title="{{ $information->title }}">
+                        <img src="{{ asset( $information->image) }}" 
+                             alt="{{ $information->title }}" 
+                             class="img-fluid w-100"
+                             style="max-height: 400px; object-fit: cover;">
+                        <div class="image-preview-overlay">
+                            <i class="fas fa-eye text-white fs-2"></i>
+                        </div>
+                    </div>
                 @endif
 
                 <h1 class="mb-3">{{ $information->title }}</h1>

@@ -21,7 +21,12 @@
             <div class="col-md-4 mb-4">
                 <div class="info-card h-100">
                     @if($information->image)
-                        <img src="{{ asset($information->image) }}" alt="{{ $information->title }}" class="img-fluid rounded mb-2" style="max-height: 200px; width: 100%; object-fit: cover;">
+                        <div class="image-preview-container rounded mb-2" style="max-height: 200px; overflow: hidden;" data-bs-toggle="modal" data-bs-target="#imagePreviewModal" data-preview-src="{{ asset($information->image) }}" data-preview-title="{{ $information->title }}">
+                            <img src="{{ asset($information->image) }}" alt="{{ $information->title }}" class="img-fluid w-100" style="height: 200px; object-fit: cover;">
+                            <div class="image-preview-overlay">
+                                <i class="fas fa-eye text-white fs-4"></i>
+                            </div>
+                        </div>
                     @endif
                     <h4 class="mb-2">{{ Str::limit($information->title, 50) }}</h4>
                     <p class="text-muted small mb-2">

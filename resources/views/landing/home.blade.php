@@ -120,7 +120,12 @@
                 <div class="info-scroll-wrapper">
                 @foreach ($informations as $information)
                     <div class="info-article-card">
-                        <img src="{{ asset($information->image) }}" alt="{{ $information->title }}">
+                        <div class="image-preview-container" data-bs-toggle="modal" data-bs-target="#imagePreviewModal" data-preview-src="{{ asset($information->image) }}" data-preview-title="{{ $information->title }}">
+                            <img src="{{ asset($information->image) }}" alt="{{ $information->title }}">
+                            <div class="image-preview-overlay">
+                                <i class="fas fa-eye text-white fs-3"></i>
+                            </div>
+                        </div>
                         <div class="card-content">
                             <h3>{{ $information->title }}</h3>
                             <p>{!! Str::limit($information->description, 250) !!}</p>

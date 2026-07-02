@@ -106,8 +106,50 @@
         </div>
     </footer>
 
+    <!-- Image Preview Modal -->
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-header border-0 p-0 position-absolute end-0 top-0" style="z-index: 10;">
+                    <button type="button" class="btn-close btn-close-white m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 text-center position-relative">
+                    <img src="" id="modalPreviewImage" class="img-fluid rounded shadow-lg" style="max-height: 85vh; width: auto; object-fit: contain;">
+                    <div class="mt-2">
+                        <span id="modalPreviewTitle" class="text-white p-2 bg-dark bg-opacity-75 rounded d-inline-block"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imagePreviewModal = document.getElementById('imagePreviewModal');
+            if (imagePreviewModal) {
+                imagePreviewModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const src = button.getAttribute('data-preview-src');
+                    const title = button.getAttribute('data-preview-title');
+                    
+                    const modalImg = imagePreviewModal.querySelector('#modalPreviewImage');
+                    const modalTitle = imagePreviewModal.querySelector('#modalPreviewTitle');
+                    
+                    modalImg.src = src;
+                    if (title) {
+                        modalTitle.textContent = title;
+                        modalTitle.parentElement.classList.remove('d-none');
+                    } else {
+                        modalTitle.textContent = '';
+                        modalTitle.parentElement.classList.add('d-none');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
