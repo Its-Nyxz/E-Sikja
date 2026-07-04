@@ -14,14 +14,14 @@
                     </div>
                 @endif
                 <div class="card-body">
-                    <form action="{{ route('data-masyarakat.update', $resident->id) }}" method="POST">
+                    <form action="{{ route('data-masyarakat.update', $resident->id) }}" method="POST" novalidate>
                         @csrf
                         @method('PUT')
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="kk">Nomor KK <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('kk') is-invalid @enderror" id="kk" name="kk" value="{{ old('kk', $resident->kk) }}" maxlength="20" required>
+                                    <input type="text" class="form-control @error('kk') is-invalid @enderror" id="kk" name="kk" value="{{ old('kk', $resident->kk) }}" minlength="16" maxlength="16" pattern="[0-9]{16}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                                     @error('kk')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -30,7 +30,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="nik">NIK <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik', $resident->nik) }}" maxlength="16" required>
+                                    <input type="text" class="form-control @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik', $resident->nik) }}" minlength="16" maxlength="16" pattern="[0-9]{16}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                                     @error('nik')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

@@ -118,8 +118,8 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|unique:users,phone',
             'password' => 'required|min:6|confirmed',
-            'kk' => 'required|max:16',
-            'nik' => 'required|unique:residents,nik|max:16',
+            'kk' => 'required|digits:16',
+            'nik' => 'required|unique:residents,nik|digits:16',
             'name' => 'required',
             'pob' => 'required',
             'dob' => 'required|date',
@@ -137,6 +137,9 @@ class AuthController extends Controller
             'nationality' => 'required|in:WNI,WNA',
             'father_name' => 'required',
             'mother_name' => 'required',
+        ], [
+            'nik.digits' => 'NIK harus berupa angka dan berjumlah tepat 16 digit.',
+            'kk.digits' => 'No. KK harus berupa angka dan berjumlah tepat 16 digit.',
         ]);
 
         if ($validator->fails()) {

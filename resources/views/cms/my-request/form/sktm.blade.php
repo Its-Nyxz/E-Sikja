@@ -28,6 +28,7 @@
                     <input type="text" class="form-control @error('nik') is-invalid @enderror" id="nik"
                         name="nik"
                         value="{{ old('nik', isset($requestLetter) ? $requestLetter->nik : $resident->nik ?? '') }}"
+                        minlength="16" maxlength="16" pattern="[0-9]{16}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                         required>
                     @error('nik')
                         <div class="invalid-feedback">{{ $message }}</div>

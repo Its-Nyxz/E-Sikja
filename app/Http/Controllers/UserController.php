@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -229,17 +230,26 @@ class UserController extends Controller
         $user->status = 'Aktif';
         $user->save();
 
-
         DB::beginTransaction();
         try {
             Notification::create([
                 'user_id' => $user->id,
                 'title' => 'Pendaftaran Berhasil',
-                'text' => 'Selamat, akun Anda berhasil diverifikasi'
+                'text' => 'Selamat, akun Anda berhasil diverifikasi',
+                'type' => 'Pendaftaran',
+                'read' => false
             ]);
+
+            // Kirim email notifikasi aktivasi akun
+            Mail::send('emails.verification_success', ['user' => $user], function ($message) use ($user) {
+                $message->to($user->email);
+                $message->subject('Akun E-Sikja Anda Telah Aktif');
+            });
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            \Log::error('Error verifying user: ' . $e->getMessage());
             return redirect()
                 ->back()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -286,8 +296,8 @@ class UserController extends Controller
                 // If user is masyarakat and has resident data, update resident data
                 if ($user->role === 'masyarakat' && $user->resident) {
                     $residentValidator = Validator::make($request->all(), [
-                        'kk' => 'required|string|max:20',
-                        'nik' => 'required|string|max:16|unique:residents,nik,' . $user->resident->id,
+                        'kk' => 'required|digits:16',
+                        'nik' => 'required|digits:16|unique:residents,nik,' . $user->resident->id,
                         'pob' => 'required|string|max:100',
                         'dob' => 'required|date',
                         'gender' => 'required|in:Laki-laki,Perempuan',
@@ -304,6 +314,9 @@ class UserController extends Controller
                         'education' => 'required|string|max:50',
                         'father_name' => 'nullable|string|max:100',
                         'mother_name' => 'nullable|string|max:100',
+                    ], [
+                        'nik.digits' => 'NIK harus berupa angka dan berjumlah tepat 16 digit.',
+                        'kk.digits' => 'No. KK harus berupa angka dan berjumlah tepat 16 digit.',
                     ]);
 
                     if ($residentValidator->fails()) {

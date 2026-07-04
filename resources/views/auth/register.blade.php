@@ -155,7 +155,7 @@
             </div>
         @endif
         
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" novalidate>
             @csrf
             
             <div class="form-section">
@@ -166,12 +166,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                             <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required>
+                            @error('username')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('username')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -179,12 +179,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required>
+                            @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -194,12 +194,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-phone"></i></span>
                             <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" required>
+                            @error('phone')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('phone')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -213,12 +213,12 @@
                                 style="border: 2px solid #e9ecef; border-left: none; border-radius: 0 8px 8px 0; background-color: #f8f9fa;">
                                 <i class="fas fa-eye" id="eyeIcon"></i>
                             </button>
+                            @error('password')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -242,26 +242,26 @@
                         <label for="kk" class="form-label required-field">Nomor KK</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                            <input id="kk" type="text" class="form-control @error('kk') is-invalid @enderror" maxlength="16" name="kk" value="{{ old('kk') }}" required>
+                            <input id="kk" type="text" class="form-control @error('kk') is-invalid @enderror" minlength="16" maxlength="16" pattern="[0-9]{16}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');" name="kk" value="{{ old('kk') }}" required>
+                            @error('kk')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('kk')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label for="nik" class="form-label required-field">NIK</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                            <input id="nik" type="text" class="form-control @error('nik') is-invalid @enderror" maxlength="16" name="nik" value="{{ old('nik') }}" required>
+                            <input id="nik" type="text" class="form-control @error('nik') is-invalid @enderror" minlength="16" maxlength="16" pattern="[0-9]{16}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');" name="nik" value="{{ old('nik') }}" required>
+                            @error('nik')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('nik')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -271,12 +271,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                             <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required>
+                            @error('name')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -284,12 +284,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                             <input id="pob" type="text" class="form-control @error('pob') is-invalid @enderror" name="pob" value="{{ old('pob') }}" required>
+                            @error('pob')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('pob')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -299,12 +299,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                             <input id="dob" type="date" class="form-control @error('dob') is-invalid @enderror" name="dob" value="{{ old('dob') }}" required>
+                            @error('dob')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('dob')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -316,12 +316,12 @@
                                 <option value="L" {{ old('gender') == 'L' ? 'selected' : '' }}>Laki-laki</option>
                                 <option value="P" {{ old('gender') == 'P' ? 'selected' : '' }}>Perempuan</option>
                             </select>
+                            @error('gender')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('gender')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -339,12 +339,12 @@
                                 <option value="Buddha" {{ old('religion') == 'Buddha' ? 'selected' : '' }}>Buddha</option>
                                 <option value="Konghucu" {{ old('religion') == 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
                             </select>
+                            @error('religion')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('religion')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -358,12 +358,12 @@
                                 <option value="Cerai Hidup" {{ old('marital_status') == 'Cerai Hidup' ? 'selected' : '' }}>Cerai Hidup</option>
                                 <option value="Cerai Mati" {{ old('marital_status') == 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
                             </select>
+                            @error('marital_status')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('marital_status')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -372,12 +372,12 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-home"></i></span>
                         <textarea id="address" class="form-control @error('address') is-invalid @enderror" name="address" required>{{ old('address') }}</textarea>
+                        @error('address')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
-                    @error('address')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
                 </div>
 
                 <div class="mb-3">
@@ -385,12 +385,12 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                         <input id="sub_village" type="text" class="form-control @error('sub_village') is-invalid @enderror" name="sub_village" value="{{ old('sub_village') }}" required>
+                        @error('sub_village')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                     </div>
-                    @error('sub_village')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
                 </div>
 
                 <div class="row mb-3">
@@ -399,12 +399,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
                             <input id="rt" type="text" class="form-control @error('rt') is-invalid @enderror" name="rt" value="{{ old('rt') }}" required>
+                            @error('rt')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('rt')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-4">
@@ -412,12 +412,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
                             <input id="rw" type="text" class="form-control @error('rw') is-invalid @enderror" name="rw" value="{{ old('rw') }}" required>
+                            @error('rw')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('rw')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-4">
@@ -425,12 +425,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-map"></i></span>
                             <input id="village" type="text" class="form-control @error('village') is-invalid @enderror" name="village" value="{{ old('village') }}" required>
+                            @error('village')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('village')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -440,12 +440,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-map"></i></span>
                             <input id="district" type="text" class="form-control @error('district') is-invalid @enderror" name="district" value="{{ old('district') }}" required>
+                            @error('district')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('district')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -453,12 +453,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
                             <input id="occupation" type="text" class="form-control @error('occupation') is-invalid @enderror" name="occupation" value="{{ old('occupation') }}" required>
+                            @error('occupation')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('occupation')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -480,12 +480,12 @@
                                 <option value="Strata II" {{ old('education') == 'Strata II' ? 'selected' : '' }}>Strata II</option>
                                 <option value="Strata III" {{ old('education') == 'Strata III' ? 'selected' : '' }}>Strata III</option>
                             </select>
+                            @error('education')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('education')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -497,12 +497,12 @@
                                 <option value="WNI" {{ old('nationality') == 'WNI' ? 'selected' : '' }}>WNI</option>
                                 <option value="WNA" {{ old('nationality') == 'WNA' ? 'selected' : '' }}>WNA</option>
                             </select>
+                            @error('nationality')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('nationality')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
             </div>
@@ -515,12 +515,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-male"></i></span>
                             <input id="father_name" type="text" class="form-control @error('father_name') is-invalid @enderror" name="father_name" value="{{ old('father_name') }}" required>
+                            @error('father_name')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('father_name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -528,12 +528,12 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-female"></i></span>
                             <input id="mother_name" type="text" class="form-control @error('mother_name') is-invalid @enderror" name="mother_name" value="{{ old('mother_name') }}" required>
+                            @error('mother_name')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
-                        @error('mother_name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
             </div>

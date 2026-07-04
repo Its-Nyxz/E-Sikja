@@ -80,8 +80,8 @@ class ResidentController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'kk' => 'required|string|max:20',
-            'nik' => 'required|string|max:16|unique:residents,nik',
+            'kk' => 'required|digits:16',
+            'nik' => 'required|digits:16|unique:residents,nik',
             'name' => 'required|string|max:100',
             'pob' => 'required|string|max:100',
             'dob' => 'required|date',
@@ -99,6 +99,9 @@ class ResidentController extends Controller
             'education' => 'required|string|max:50',
             'father_name' => 'nullable|string|max:100',
             'mother_name' => 'nullable|string|max:100',
+        ], [
+            'nik.digits' => 'NIK harus berupa angka dan berjumlah tepat 16 digit.',
+            'kk.digits' => 'No. KK harus berupa angka dan berjumlah tepat 16 digit.',
         ]);
 
         if ($validator->fails()) {
@@ -163,8 +166,8 @@ class ResidentController extends Controller
     public function update(Request $request, string $id)
     {
         $validator = Validator::make($request->all(), [
-            'kk' => 'required|string|max:20',
-            'nik' => 'required|string|max:16|unique:residents,nik,' . $id,
+            'kk' => 'required|digits:16',
+            'nik' => 'required|digits:16|unique:residents,nik,' . $id,
             'name' => 'required|string|max:100',
             'pob' => 'required|string|max:100',
             'dob' => 'required|date',
@@ -182,6 +185,9 @@ class ResidentController extends Controller
             'education' => 'required|string|max:50',
             'father_name' => 'nullable|string|max:100',
             'mother_name' => 'nullable|string|max:100',
+        ], [
+            'nik.digits' => 'NIK harus berupa angka dan berjumlah tepat 16 digit.',
+            'kk.digits' => 'No. KK harus berupa angka dan berjumlah tepat 16 digit.',
         ]);
 
         if ($validator->fails()) {

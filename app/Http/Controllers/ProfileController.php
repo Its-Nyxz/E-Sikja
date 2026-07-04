@@ -55,8 +55,8 @@ class ProfileController extends Controller
             // If user is masyarakat and has resident data, update resident data
             if ($user->role === 'masyarakat' && $user->resident) {
                 $residentValidator = Validator::make($request->all(), [
-                    'nik' => 'required|string|max:16|unique:residents,nik,' . $user->resident->id,
-                    'kk' => 'required|string|max:20',
+                    'nik' => 'required|digits:16|unique:residents,nik,' . $user->resident->id,
+                    'kk' => 'required|digits:16',
                     'pob' => 'required|string|max:100',
                     'dob' => 'required|date',
                     'gender' => 'required|in:Laki-laki,Perempuan',
@@ -71,6 +71,9 @@ class ProfileController extends Controller
                     'education' => 'required|string|max:50',
                     'father_name' => 'nullable|string|max:100',
                     'mother_name' => 'nullable|string|max:100',
+                ], [
+                    'nik.digits' => 'NIK harus berupa angka dan berjumlah tepat 16 digit.',
+                    'kk.digits' => 'No. KK harus berupa angka dan berjumlah tepat 16 digit.',
                 ]);
 
                 if ($residentValidator->fails()) {

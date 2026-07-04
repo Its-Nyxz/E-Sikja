@@ -168,6 +168,7 @@ class RequestController extends Controller
             $status = $request->status;
 
             $requestLetter = RequestLetter::findOrFail($id);
+            $oldStatus = $requestLetter->status; // Simpan status lama sebelum diubah
 
             // Update request letter status
 
@@ -214,6 +215,100 @@ class RequestController extends Controller
                 $notes = "Status pengajuan diperbarui menjadi " . $status . " oleh petugas (" . Auth::user()->name . ")." . ($request->notes ? " Catatan: " . $request->notes : "");
             }
             $requestLetter->update($data);
+
+            // Otomatisasi data penduduk untuk SKKEL, SKPDT, dan SKKEM saat status disetujui (Selesai)
+            if ($status == 'Selesai' && $oldStatus != 'Selesai') {
+                $typeCode = $requestLetter->requestType->code;
+                $letterData = json_decode($requestLetter->data);
+
+                if ($typeCode == 'SKKEL') {
+                    $childName = $letterData->child_name ?? '';
+                    $birthDate = $letterData->birth_date ?? '';
+                    $fatherName = $letterData->father_name ?? '';
+                    $motherName = $letterData->mother_name ?? '';
+
+                    $exists = \App\Models\Resident::where('name', $childName)
+                        ->whereDate('dob', $birthDate)
+                        ->where('father_name', $fatherName)
+                        ->where('mother_name', $motherName)
+                        ->exists();
+
+                    if (!$exists) {
+                        $applicantResident = $requestLetter->user->resident ?? null;
+                        $parentNik = $applicantResident->nik ?? '3313000000000000';
+                        $nikPrefix = substr($parentNik, 0, 12);
+                        do {
+                            $nik = $nikPrefix . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+                        } while (\App\Models\Resident::where('nik', $nik)->exists());
+
+                        \App\Models\Resident::create([
+                            'kk' => $applicantResident->kk ?? '3313000000000000',
+                            'nik' => $nik,
+                            'name' => $childName,
+                            'pob' => $letterData->birth_place ?? '-',
+                            'dob' => $birthDate,
+                            'gender' => $letterData->child_gender ?? 'Laki-laki',
+                            'address' => $letterData->address ?? ($applicantResident->address ?? '-'),
+                            'rt' => $applicantResident->rt ?? '00',
+                            'rw' => $applicantResident->rw ?? '00',
+                            'sub_village' => $applicantResident->sub_village ?? '-',
+                            'village' => $applicantResident->village ?? '-',
+                            'district' => $applicantResident->district ?? '-',
+                            'religion' => $letterData->child_religion ?? 'Islam',
+                            'marital_status' => 'Belum Kawin',
+                            'occupation' => 'Belum/Tidak Bekerja',
+                            'nationality' => 'WNI',
+                            'education' => 'Tidak/Belum Sekolah',
+                            'father_name' => $fatherName,
+                            'mother_name' => $motherName
+                        ]);
+                    }
+                } elseif ($typeCode == 'SKPDT') {
+                    $nik = $letterData->nik ?? '';
+                    $exists = \App\Models\Resident::where('nik', $nik)->exists();
+
+                    if (!$exists && !empty($nik)) {
+                        $applicantResident = $requestLetter->user->resident ?? null;
+
+                        \App\Models\Resident::create([
+                            'kk' => $applicantResident->kk ?? ($letterData->kk ?? '3313000000000000'),
+                            'nik' => $nik,
+                            'name' => $letterData->name ?? '',
+                            'pob' => $letterData->pob ?? '',
+                            'dob' => $letterData->dob ?? '',
+                            'gender' => $letterData->gender ?? 'Laki-laki',
+                            'address' => $letterData->destination_address ?? '',
+                            'rt' => $applicantResident->rt ?? '00',
+                            'rw' => $applicantResident->rw ?? '00',
+                            'sub_village' => $applicantResident->sub_village ?? '-',
+                            'village' => $applicantResident->village ?? '-',
+                            'district' => $applicantResident->district ?? '-',
+                            'religion' => $letterData->religion ?? 'Islam',
+                            'marital_status' => $letterData->marital_status ?? 'Belum Kawin',
+                            'occupation' => $letterData->occupation ?? 'Belum/Tidak Bekerja',
+                            'nationality' => 'WNI',
+                            'education' => 'Tidak/Belum Sekolah',
+                            'father_name' => '-',
+                            'mother_name' => '-'
+                        ]);
+                    }
+                } elseif ($typeCode == 'SKKEM') {
+                    $deceasedName = $letterData->deceased_name ?? '';
+                    $birthDate = $letterData->birth_date ?? '';
+
+                    $deceasedResident = \App\Models\Resident::where('name', $deceasedName)
+                        ->whereDate('dob', $birthDate)
+                        ->first();
+
+                    if ($deceasedResident) {
+                        $deceasedUser = \App\Models\User::where('resident_id', $deceasedResident->id)->first();
+                        if ($deceasedUser) {
+                            $deceasedUser->delete();
+                        }
+                        $deceasedResident->delete();
+                    }
+                }
+            }
 
             HistoryRequestLetter::create([
                 'request_letter_id' => $requestLetter->id,

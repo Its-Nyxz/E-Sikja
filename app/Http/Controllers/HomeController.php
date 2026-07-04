@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Information;
 
 class HomeController extends Controller
@@ -97,5 +98,24 @@ class HomeController extends Controller
             'profile' => $profile
         ];
         return view('landing.profile')->with($data);
+    }
+
+    public function testMail()
+    {
+        $details = [
+            'title' => 'Test Email dari E-Sikja',
+            'body' => 'Ini adalah email percobaan menggunakan konfigurasi Mail E-Sikja.'
+        ];
+
+        try {
+            Mail::raw($details['body'], function ($message) use ($details) {
+                $message->to('ndemndem69@gmail.com')
+                    ->subject($details['title']);
+            });
+
+            return '✅ Email berhasil dikirim!';
+        } catch (\Exception $e) {
+            return '❌ Gagal mengirim email: ' . $e->getMessage();
+        }
     }
 }
